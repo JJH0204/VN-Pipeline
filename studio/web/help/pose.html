@@ -187,7 +187,7 @@
   <thead><tr><th>항목</th><th>NoobAI OpenPose (WAI·NoobAI 권장)</th><th>xinsir OpenPose (SDXL 범용)</th></tr></thead>
   <tbody>
     <tr><th scope="row">파일</th><td><code>noob_openpose.safetensors</code></td><td><code>controlnet-openpose-sdxl-1.0.safetensors</code></td></tr>
-    <tr><th scope="row">위치</th><td><code>/Volumes/T7/VN-Pipeline/models/controlnet/</code></td><td><code>/Volumes/T7/ComfyUI/Installs/ComfyUI/ComfyUI/models/controlnet/</code> (엔진 폴더)</td></tr>
+    <tr><th scope="row">위치</th><td><code>/Volumes/T7/VN-Pipeline/models/controlnet/</code></td><td><code>/Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/ComfyUI/models/controlnet/</code> (엔진 폴더)</td></tr>
     <tr><th scope="row">만든 곳</th><td>Laxhar(NoobAI-XL 개발팀). NoobAI·Illustrious 계열 전용으로 학습</td><td>xinsir. SDXL 범용</td></tr>
     <tr><th scope="row">뼈대 선</th><td>얇은 표준 선</td><td>굵은 선</td></tr>
     <tr><th scope="row">권장 강도 / 구간</th><td>1.0 / 1.0</td><td>1.2 이상 / 1.0</td></tr>
@@ -231,7 +231,7 @@
   <thead><tr><th>앱에서 쓰는 이름 (넣을 곳)</th><th>Hugging Face 저장소</th><th>받을 파일</th></tr></thead>
   <tbody>
     <tr><td><code>noob_openpose.safetensors</code><br>(<code>/Volumes/T7/VN-Pipeline/models/controlnet/</code>)</td><td><code>Laxhar/noob_openpose</code></td><td><code>openpose_pre.safetensors</code></td></tr>
-    <tr><td><code>controlnet-openpose-sdxl-1.0.safetensors</code><br>(<code>/Volumes/T7/ComfyUI/Installs/ComfyUI/ComfyUI/models/controlnet/</code>)</td><td><code>xinsir/controlnet-openpose-sdxl-1.0</code></td><td><code>diffusion_pytorch_model.safetensors</code></td></tr>
+    <tr><td><code>controlnet-openpose-sdxl-1.0.safetensors</code><br>(<code>/Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/ComfyUI/models/controlnet/</code>)</td><td><code>xinsir/controlnet-openpose-sdxl-1.0</code></td><td><code>diffusion_pytorch_model.safetensors</code></td></tr>
   </tbody>
 </table>
 <ol>
@@ -319,5 +319,5 @@ python3 vn.py cg haru "park, sunset, waving, smile" --pose poses/pose_20261109_1
   </tbody>
 </table>
 <p>감지에 필요한 부품(onnxruntime·OpenCV·numpy)은 엔진 Python에만 들어 있습니다. <code>python3</code>로 실행했을 때 이런 부품이 없다는 오류가 나오면 엔진 Python으로 실행하세요.</p>
-<pre><code>/Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py pose detect ~/Desktop/reference.png</code></pre>
+<pre><code>/Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py pose detect ~/Desktop/reference.png</code></pre>
 </section>

@@ -261,7 +261,7 @@
   <li>모델·LoRA 탭의 <strong>URL로 다운로드</strong>는 <code>.onnx</code> 파일을 받지 않습니다. 브라우저로 받아 직접 넣으세요.</li>
   <li>작은 태거는 점수가 전체적으로 낮게 나오는 편입니다. 바꾼 뒤 태그가 너무 적다면 일반 기준값을 0.25~0.3으로 낮춰 보세요.</li>
   <li>v3가 아닌 예전 태거(v2 등)나 다른 제작자의 태거는 형식이 달라 동작을 보장하지 않습니다.</li>
-  <li>다른 모델 폴더와 마찬가지로 엔진 폴더(<code>ComfyUI/models/tagger/</code>)와 <code>/Volumes/T7/ComfyUI/Shared/models/tagger/</code>에 넣은 태거도 인식합니다(<a href="#files-models">모델 폴더</a>).</li>
+  <li>다른 모델 폴더와 마찬가지로 엔진 폴더(<code>ComfyUI/models/tagger/</code>)와 <code>/Volumes/T7/VN-Pipeline/ComfyUI/Shared/models/tagger/</code>에 넣은 태거도 인식합니다(<a href="#files-models">모델 폴더</a>).</li>
   <li>태거 프로그램(onnxruntime)은 엔진 Python에 이미 설치되어 있습니다. 엔진 환경에 패키지를 직접 설치하지 마세요.</li>
 </ul>
 
@@ -281,5 +281,5 @@ python3 vn.py tag ~/Desktop/reference.png --threshold 0.45</code></pre>
 </table>
 <p>CLI는 기본으로 <strong>제외 권장</strong> 그룹만 뺍니다. 3D 원본용 기본 제외(포즈·구도·배경)는 화면에서만 적용되므로, 3D 캡처 이미지를 CLI로 읽을 때는 결과를 직접 골라 쓰세요.</p>
 <p>태거에 필요한 부품(onnxruntime·Pillow·numpy)은 엔진 Python에만 들어 있습니다. <code>python3</code>로 실행했을 때 이런 부품이 없다는 오류가 나오면 엔진 Python으로 실행하세요.</p>
-<pre><code>/Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py tag output/haru/sprite/haru_smile_00001_.png</code></pre>
+<pre><code>/Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py tag output/haru/sprite/haru_smile_00001_.png</code></pre>
 </section>

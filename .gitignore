@@ -3,6 +3,8 @@
 /output/
 /user/
 /input/
+# ComfyUI 엔진·공유 모델 (약 25GB)
+/ComfyUI/
 /VN Studio.app/
 
 # 기기별 설정: 원격 접속 허용 계정·Civitai 토큰이 들어감. 없으면 vnlib/config.py가 기본값으로 만든다

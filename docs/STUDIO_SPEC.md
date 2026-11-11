@@ -7,7 +7,7 @@ VN-Pipeline(로컬 ComfyUI 기반 연애시뮬/비주얼노벨 에셋 생성기)
 ## 0. 실행 환경 (중요)
 
 - 프로젝트 루트: `/Volumes/T7/VN-Pipeline` (외장 SSD, APFS)
-- Python: **엔진 Python** `/Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python` (3.13)
+- Python: **엔진 Python** `/Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/standalone-env/bin/python` (3.13)
   - 사용 가능: `aiohttp 3.13`, `Pillow 12`, `yaml`, `numpy 2.4`, `onnxruntime 1.31`(태거용, 2026-11-08 설치), 표준 라이브러리. **그 밖의 pip 설치 금지**(엔진 환경 오염).
 - macOS (Apple M4 Pro 24GB). 브라우저: Google Chrome, Safari 설치됨.
 - ComfyUI: `http://127.0.0.1:8188` (현재 실행 중일 수 있음). 실행 스크립트: `/Volumes/T7/VN-Pipeline/start.sh`

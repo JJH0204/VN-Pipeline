@@ -192,7 +192,7 @@ python3 vn.py prompt "waving, park, cherry blossoms" --char haru
 `tag` 옵션: `--threshold`(일반 태그, 기본 0.35), `--char-threshold`(캐릭터 태그, 기본 0.85), `--model <태거 폴더 이름>`, `--all`(제외 권장 태그까지 출력). 태거에 필요한 onnxruntime·Pillow·numpy(`pose detect`는 OpenCV도)는 엔진 Python에만 있으므로, `python3`에서 모듈이 없다는 오류가 나면 엔진 Python으로 실행하세요:
 
 ```bash
-/Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py tag output/haru/sprite/haru_smile_00001_.png
+/Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py tag output/haru/sprite/haru_smile_00001_.png
 ```
 
 ## 라이선스 주의

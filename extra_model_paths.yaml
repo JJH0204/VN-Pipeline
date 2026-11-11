@@ -1,6 +1,6 @@
 # VN-Pipeline 전용 모델 + 기존 공유 모델 폴더(LoRA 등) 함께 사용
 vn_pipeline:
-  base_path: /Volumes/T7/VN-Pipeline/models
+  base_path: models  # 이 파일이 있는 폴더(VN-Pipeline) 기준
   is_default: true
   checkpoints: checkpoints
   loras: loras
@@ -14,7 +14,7 @@ vn_pipeline:
   embeddings: embeddings
 
 legacy_shared:
-  base_path: /Volumes/T7/ComfyUI/Shared/models
+  base_path: ComfyUI/Shared/models
   checkpoints: checkpoints
   loras: loras
   vae: vae

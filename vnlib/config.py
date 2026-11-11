@@ -26,7 +26,7 @@ CONFIG_DIR = ROOT / "config"
 CHAR_DIR = ROOT / "characters"
 OUTPUT_DIR = ROOT / "output"
 USER_DIR = ROOT / "user"
-ENGINE_DIR = Path("/Volumes/T7/ComfyUI/Installs/ComfyUI")
+ENGINE_DIR = ROOT / "ComfyUI" / "Installs" / "ComfyUI"  # ComfyUI 엔진 (git에 넣지 않음)
 ENGINE_PYTHON = ENGINE_DIR / "standalone-env" / "bin" / "python"
 
 # 모델 파일 검색 경로. 같은 이름이 여러 곳에 있으면 앞쪽이 우선 — ComfyUI가 실제로 찾는 순서와 같게 유지:
@@ -35,7 +35,7 @@ ENGINE_PYTHON = ENGINE_DIR / "standalone-env" / "bin" / "python"
 MODEL_ROOTS = [
     ROOT / "models",
     ENGINE_DIR / "ComfyUI" / "models",
-    Path("/Volumes/T7/ComfyUI/Shared/models"),
+    ROOT / "ComfyUI" / "Shared" / "models",
 ]
 
 DEFAULT_PRESETS = {

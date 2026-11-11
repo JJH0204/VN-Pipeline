@@ -17,7 +17,7 @@ export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 export LANG="${LANG:-ko_KR.UTF-8}"
 
 ROOT="${0:A:h}"
-PY="/Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python"
+PY="$ROOT/ComfyUI/Installs/ComfyUI/standalone-env/bin/python"
 SERVER="$ROOT/studio/server.py"
 USER_DIR="$ROOT/user"
 LOG="$USER_DIR/studio.log"

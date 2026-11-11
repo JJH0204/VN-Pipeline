@@ -2,7 +2,7 @@
 """VN Studio 백엔드 서버 (aiohttp, 127.0.0.1 전용).
 
 실행:
-  /Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python studio/server.py [--port 8190] [--no-autostart] [--app]
+  /Volumes/T7/VN-Pipeline/ComfyUI/Installs/ComfyUI/standalone-env/bin/python studio/server.py [--port 8190] [--no-autostart] [--app]
 
 구성:
   server.py      라우트·미들웨어·앱 수명주기
