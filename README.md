@@ -107,6 +107,15 @@ scripts/stop_studio.sh
 - **아이콘** (`icon`): 한 줄에 하나(`파일이름: 설명` 가능), 세트 전체가 같은 시드. 스타일 게임 아이템·플랫·앱 아이콘·도트. 앱 아이콘은 모델이 그린 심볼(배경 제거, 테두리에 맞춰 긴 변 64%)을 코드로 그린 둥근 사각형 색 타일(`input/icon_tiles/`, 8색·자동 순환)에 합성. 원본 `output/icons/세트/이름_seed….png` + 크기별 `output/icons/세트/<N>px/`.
 - 세 모드 모두 ComfyUI 기본 노드만 씁니다(추가 설치 없음). 썸네일·라이트박스는 작은 그림을 최근접 확대로 보여 줍니다.
 
+## 3D 모션 파이프라인 (통합 예정)
+
+`ComfyUI/motion-pipeline/`은 글로 동작을 설명하면 3D 캐릭터 모션을 만들어 Unity용 FBX로 내보내는 별도 파이프라인입니다(MoMask, HY-Motion → BVH → Blender로 FBX). 생성 환경은 `ComfyUI/miniconda3/`(conda 환경 `momask`, `motion311`), 모델은 `ComfyUI/Shared/models/`의 `hymotion/`, `text_encoders/`(Qwen3-8B, CLIP)입니다. 나중에 VN Studio의 리소스 제작 파이프라인에 넣을 예정이며, 지금은 그대로는 실행되지 않습니다.
+
+- conda가 다른 컴퓨터 계정 경로에 설치된 것을 복사해 둔 것이라 환경을 다시 만들어야 합니다(`MoMask/environment.yml`).
+- 스크립트가 `~/miniconda3`, `~/ComfyUI-Shared` 경로를 가리킵니다. 이 폴더 기준으로 바꿔야 합니다.
+- 엔진의 HY-Motion 확장 노드가 모델을 찾으려면 `extra_model_paths.yaml`에 `hymotion` 경로를 추가해야 합니다.
+- FBX 변환에는 Blender가 필요합니다.
+
 ## 품질 파이프라인 (기본값)
 
 1. 1차 생성 (832x1216)
