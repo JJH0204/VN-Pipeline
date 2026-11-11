@@ -197,6 +197,8 @@ python3 vn.py prompt "waving, park, cherry blossoms" --char haru
 
 ## 라이선스 주의
 
+이 저장소의 코드는 [MIT 라이선스](LICENSE)입니다. `studio/web/vendor/`의 외부 라이브러리(three.js, @pixiv/three-vrm, qrcode-generator)는 각자의 라이선스(모두 MIT)를 따르고, 모델 파일은 저장소에 들어 있지 않으며 아래처럼 모델마다 조건이 다릅니다.
+
 NoobAI-XL의 라이선스는 모델로 만든 결과물을 포함해 모든 상업적 이용을 금지합니다. 판매할 게임에 쓸 에셋이라면 `noob`, `noob-hq`, `noob-eps` 결과물은 쓰지 마세요. 포즈용 `noob_openpose` ControlNet도 같은 팀의 모델이고 라이선스 표기가 없으므로 같은 조건으로 보고, 판매용에는 Apache-2.0인 xinsir ControlNet을 쓰세요. WAI 등 다른 모델도 원본 배포 페이지의 라이선스를 직접 확인한 뒤 사용하세요.
 
 ## 모델 다시 받기
