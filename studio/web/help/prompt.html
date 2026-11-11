@@ -1,0 +1,101 @@
+<section id="prompt">
+<h2>프롬프트 작성법</h2>
+<p>이 앱의 기본 모델들(Illustrious·NoobAI 계열)은 애니메이션 그림 사이트 Danbooru의 <strong>태그</strong>가 달린 이미지로 학습되었습니다. 그래서 문장보다 <strong>쉼표로 구분한 영어 태그</strong>를 훨씬 정확하게 알아듣습니다.</p>
+<pre><code>1girl, solo, black hair, twintails, maid, holding tray, cafe, smile, upper body</code></pre>
+
+<h3 id="prompt-basics">기본 규칙</h3>
+<ul>
+  <li><strong>영어 태그를 쉼표로 구분</strong>해 씁니다. 한국어는 이해하지 못합니다.</li>
+  <li>Danbooru 태그 이름의 밑줄(<code>long_hair</code>)은 띄어쓰기(<code>long hair</code>)로 쓰는 것을 권장합니다. 소문자로 씁니다.</li>
+  <li>태그가 맞는지 모르겠다면 Danbooru(danbooru.donmai.us)에서 검색해 보세요. 그림 수가 많은 태그(대략 1,000장 이상)일수록 모델이 잘 압니다.</li>
+  <li>생성 탭의 <strong>프롬프트 도우미</strong>에서 표정·포즈·구도·의상·배경·조명 태그를 클릭해 바로 넣을 수 있습니다.</li>
+  <li>짧은 영어 구절도 어느 정도 이해하지만(<code>girl holding an umbrella</code>), 같은 뜻의 태그(<code>holding umbrella</code>)가 더 확실합니다.</li>
+</ul>
+
+<h3 id="prompt-order">순서와 구성</h3>
+<p>앞쪽 태그가 조금 더 강하게 반영되는 경향이 있습니다. 아래 순서로 쓰면 무난합니다.</p>
+<ol>
+  <li>인원: <code>1girl, solo</code></li>
+  <li>외형: 머리 색·길이·모양, 눈 색, 체형, 특징 소품</li>
+  <li>의상: 옷 종류와 색</li>
+  <li>표정·포즈·구도: <code>smile, standing, upper body, looking at viewer</code></li>
+  <li>배경·조명: <code>classroom, sunlight</code></li>
+  <li>그림체·품질: 품질 태그는 프리셋이 자동으로 붙입니다</li>
+</ol>
+<p>앱은 아래 순서로 최종 프롬프트를 조립합니다. 캐릭터를 고르면 1~3번을 캐릭터 정보로 채우므로 여러분은 상황만 쓰면 됩니다.</p>
+<table>
+  <thead><tr><th>구분</th><th>조립 순서</th></tr></thead>
+  <tbody>
+    <tr><td>긍정 프롬프트</td><td>기본 태그 → 외형 → 의상 → <strong>입력한 프롬프트·포즈·장면</strong> → 스타일 → 프리셋 품질 태그</td></tr>
+    <tr><td>부정 프롬프트</td><td>프리셋 기본 네거티브 → 캐릭터 네거티브 → 추가 네거티브</td></tr>
+  </tbody>
+</table>
+<p>예를 들어 haru의 시안(wai 프리셋)은 실제로 이런 프롬프트가 됩니다.</p>
+<pre><code>1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, upper body, looking at viewer, smile, simple background, white background, masterpiece, best quality, amazing quality</code></pre>
+
+<h3 id="prompt-weight">가중치: 강조와 약화</h3>
+<table>
+  <thead><tr><th>쓰는 법</th><th>의미</th></tr></thead>
+  <tbody>
+    <tr><td><code>(amber eyes:1.2)</code></td><td>1.2배 강조</td></tr>
+    <tr><td><code>(amber eyes)</code></td><td>1.1배 강조 (숫자를 생략한 경우)</td></tr>
+    <tr><td><code>(hair ribbon:0.8)</code></td><td>0.8배로 약화</td></tr>
+    <tr><td><code>(red neckerchief, navy sailor collar:1.15)</code></td><td>여러 태그를 한꺼번에 강조</td></tr>
+    <tr><td><code>star \(symbol\)</code></td><td>태그 이름에 괄호가 들어 있으면 <code>\(</code> <code>\)</code>로 써야 가중치 문법으로 오해하지 않습니다</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>권장 범위는 <strong>0.8~1.3</strong>입니다. 1.4를 넘기면 색이 타거나 형태가 깨지기 쉽습니다.</li>
+  <li>다른 프로그램(WebUI)에서 쓰는 <code>[tag]</code> 약화 문법은 이 엔진(ComfyUI)에서는 동작하지 않습니다. <code>(tag:0.8)</code>을 쓰세요.</li>
+  <li>강조보다 먼저 시도할 것: 태그를 앞으로 옮기기, 서로 충돌하는 태그 지우기.</li>
+</ul>
+
+<h3 id="prompt-negative">네거티브 프롬프트</h3>
+<p>네거티브는 "이런 쪽으로는 가지 마"라는 방향을 줍니다. 프리셋에 품질 관련 기본 네거티브(<code>worst quality, bad hands</code> 등)와 <code>nsfw</code>가 이미 들어 있으므로, 추가 네거티브에는 <strong>이번 그림에서 자꾸 나오는 것</strong>만 짧게 적습니다.</p>
+<ul>
+  <li>자주 쓰는 예: <code>hat</code>, <code>glasses</code>, <code>multiple girls</code>, <code>text, watermark</code>, <code>cropped</code></li>
+  <li>네거티브를 길게 늘어놓으면 그림이 흐려지거나 단조로워질 수 있습니다. 특히 WAI 모델은 짧을수록 좋습니다.</li>
+  <li>"없애기"보다 "원하는 것을 적기"가 더 잘 통합니다. 단발이 자꾸 나오면 네거티브에 <code>short hair</code>를 넣기보다 긍정에 <code>(long hair:1.2)</code>를 쓰는 편이 확실합니다.</li>
+</ul>
+
+<h3 id="prompt-consistency">캐릭터를 일관되게 유지하는 요령</h3>
+<ul>
+  <li><strong>외형은 캐릭터 칸에 한 번만 적습니다.</strong> 매번 손으로 다시 쓰면 조금씩 달라집니다. 캐릭터를 고르면 앱이 같은 태그를 자동으로 넣어 줍니다.</li>
+  <li><strong>구체적이고 특징적으로 씁니다.</strong> <code>cute girl</code>보다 <code>light brown hair, side braid, hair ribbon, amber eyes</code>가 훨씬 일정하게 나옵니다. 머리 장식처럼 눈에 띄는 소품 하나가 "같은 사람"이라는 인상을 크게 좌우합니다.</li>
+  <li><strong>의상은 색과 부위를 함께</strong> 적습니다: <code>navy sailor collar, red neckerchief, navy skirt</code></li>
+  <li><strong>색 번짐에 주의합니다.</strong> 색 태그가 많으면 다른 부위로 옮겨 가기도 합니다(예: 스카프의 빨간색이 눈 색에 섞임). 중요한 색은 <code>(amber eyes:1.15)</code>처럼 살짝 강조하세요.</li>
+  <li><strong>충돌하는 태그를 피합니다.</strong> 외형에 <code>long hair</code>가 있는데 장면에 <code>short hair</code>를 쓰면 결과가 불안정해집니다.</li>
+  <li><strong>프리셋과 LoRA를 고정합니다.</strong> 모델이 바뀌면 같은 태그라도 얼굴이 달라집니다.</li>
+  <li>더 강한 일관성이 필요하면 캐릭터 LoRA를 쓰는 방법이 있습니다. 마음에 드는 결과물 20~50장으로 별도 도구(kohya_ss 등)에서 직접 학습할 수 있으며, 만든 LoRA는 캐릭터의 LoRA 칸에 넣으면 됩니다.</li>
+</ul>
+
+<h3 id="prompt-tags">자주 쓰는 태그</h3>
+<table>
+  <thead><tr><th>분류</th><th>태그 (뜻)</th></tr></thead>
+  <tbody>
+    <tr><td>구도</td><td><code>full body</code> 전신, <code>cowboy shot</code> 허벅지 위, <code>upper body</code> 상반신, <code>portrait</code> 얼굴·어깨, <code>close-up</code> 클로즈업, <code>from above</code> 위에서, <code>from below</code> 아래에서, <code>from side</code> 옆에서, <code>pov</code> 1인칭 시점</td></tr>
+    <tr><td>포즈</td><td><code>standing</code>, <code>sitting</code>, <code>arms at sides</code> 차렷, <code>hands on own hips</code> 허리에 손, <code>arms behind back</code> 뒷짐, <code>hand on own chest</code>, <code>waving</code> 손 흔들기, <code>v</code> 브이 사인, <code>head tilt</code> 고개 갸웃, <code>leaning forward</code> 앞으로 숙이기</td></tr>
+    <tr><td>시선</td><td><code>looking at viewer</code> 정면 응시, <code>looking away</code> 시선 피하기, <code>looking to the side</code>, <code>looking down</code>, <code>looking back</code> 뒤돌아보기</td></tr>
+    <tr><td>표정</td><td><code>smile</code>, <code>light smile</code> 옅은 미소, <code>grin</code> 활짝, <code>open mouth</code>, <code>closed mouth</code>, <code>blush</code> 홍조, <code>embarrassed</code>, <code>pout</code> 뾰로통, <code>angry</code>, <code>v-shaped eyebrows</code> 화난 눈썹, <code>sad</code>, <code>frown</code>, <code>teary eyes</code> 글썽, <code>tears</code>, <code>crying</code>, <code>surprised</code>, <code>wide-eyed</code>, <code>closed eyes</code>, <code>half-closed eyes</code>, <code>one eye closed</code> 윙크, <code>smug</code> 의기양양, <code>worried</code>, <code>nervous</code>, <code>sweatdrop</code> 식은땀, <code>expressionless</code> 무표정</td></tr>
+    <tr><td>장소</td><td><code>classroom</code>, <code>school hallway</code>, <code>rooftop</code>, <code>library</code>, <code>cafe</code>, <code>bedroom</code>, <code>park</code>, <code>street</code>, <code>train station</code>, <code>beach</code>, <code>shrine</code></td></tr>
+    <tr><td>시간·조명</td><td><code>day</code>, <code>sunset</code>, <code>evening</code>, <code>night</code>, <code>sunlight</code> 햇살, <code>backlighting</code> 역광, <code>moonlight</code>, <code>light rays</code> 빛줄기, <code>rain</code>, <code>snow</code>, <code>cherry blossoms</code> 벚꽃</td></tr>
+    <tr><td>배경 처리</td><td><code>simple background</code>, <code>white background</code>, <code>grey background</code>, <code>blurry background</code> 배경 흐림, <code>depth of field</code> 심도</td></tr>
+  </tbody>
+</table>
+
+<h3 id="prompt-length">길이</h3>
+<p>태그는 20~40개 정도가 적당합니다. 너무 많으면 각 태그의 힘이 약해지고, 서로 충돌할 가능성도 커집니다. 결과가 마음에 안 들 때 태그를 더 붙이기보다 빼 보는 것도 좋은 방법입니다.</p>
+
+<h3 id="prompt-fix">결과가 마음에 안 들 때</h3>
+<table>
+  <thead><tr><th>증상</th><th>해 볼 것</th></tr></thead>
+  <tbody>
+    <tr><td>특정 태그가 무시됨</td><td>태그를 앞쪽으로 옮기기 → <code>(tag:1.2)</code>로 강조 → 충돌하는 태그 지우기 → Danbooru에서 정확한 태그 이름 확인</td></tr>
+    <tr><td>사람이 두 명 나옴</td><td><code>solo</code> 확인, 추가 네거티브에 <code>multiple girls, 2girls</code></td></tr>
+    <tr><td>전신이 잘림</td><td><code>full body</code>와 신발 태그(<code>shoes</code>, <code>loafers</code>) 추가, 크기는 세로(832×1216) 사용</td></tr>
+    <tr><td>배경이 너무 복잡함</td><td><code>simple background, white background</code></td></tr>
+    <tr><td>머리색·눈색이 섞임</td><td>색 태그 수 줄이기, 중요한 색만 살짝 강조</td></tr>
+    <tr><td>원하지 않는 소품이 계속 나옴</td><td>함께 딸려 오는 태그 찾기(예: <code>school uniform</code>은 가방을 부르기도 함), 추가 네거티브에 그 소품</td></tr>
+  </tbody>
+</table>
+</section>

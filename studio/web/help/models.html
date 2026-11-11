@@ -1,0 +1,185 @@
+<section id="models">
+<h2>모델(체크포인트)과 프리셋</h2>
+
+<h3 id="models-what">체크포인트란?</h3>
+<p><strong>체크포인트</strong>(줄여서 모델)는 그림을 그리는 "두뇌"에 해당하는 6~7GB짜리 파일 하나입니다. 그림체, 인체 구조, 어떤 태그가 무엇을 뜻하는지에 대한 지식이 모두 이 안에 들어 있습니다. 모델을 바꾸면 같은 프롬프트와 시드로도 그림체·색감·얼굴이 완전히 달라집니다.</p>
+<p>VN Studio에서는 체크포인트 파일을 직접 고르지 않고 <strong>프리셋</strong>을 고릅니다. 프리셋은 "체크포인트 + 그 모델에 맞는 권장 설정(샘플러, CFG, 스텝, 품질 태그, 기본 네거티브, 기본 LoRA)"을 한데 묶은 것입니다. 같은 체크포인트로 설정만 다른 프리셋을 여러 개 만들 수도 있습니다.</p>
+<table>
+  <thead><tr><th>계열</th><th>구조</th><th>특징</th><th>이 PC의 예</th></tr></thead>
+  <tbody>
+    <tr><td>Illustrious</td><td>SDXL</td><td>Danbooru 태그를 잘 이해하는 애니 일러스트용 기반 모델. 현재 애니 그림의 사실상 표준</td><td>waiIllustriousSDXL_v170</td></tr>
+    <tr><td>NoobAI-XL</td><td>SDXL</td><td>Illustrious를 바탕으로 추가 학습. 아는 태그가 많음. 일반(eps)판과 v-pred판이 따로 있음</td><td>NoobAI-XL-v1.1, NoobAI-XL-Vpred-v1.0</td></tr>
+    <tr><td>Pony</td><td>SDXL</td><td><code>score_9, score_8_up</code> 같은 고유 품질 태그를 써야 함. LoRA도 Pony용이 따로 있음</td><td>—</td></tr>
+    <tr><td>기타 SDXL 애니 모델</td><td>SDXL</td><td>모델마다 권장 설정이 다르므로 배포 페이지를 꼭 확인</td><td>aamXLAnimeMix_v10</td></tr>
+    <tr><td>SD1.5</td><td>SD1.5</td><td>512px 기준의 이전 세대. 이 앱에서는 권장하지 않음</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h3 id="models-installed">이 PC에 설치된 체크포인트</h3>
+<table>
+  <thead><tr><th>파일</th><th>구조</th><th>예측 방식</th><th>프리셋</th><th>특징</th></tr></thead>
+  <tbody>
+    <tr><td><code>waiIllustriousSDXL_v170</code></td><td>SDXL</td><td>eps</td><td><code>wai</code> (기본)</td><td>깔끔한 애니 캐릭터 그림체. 손과 팔다리가 안정적이라 처음에는 이것만 써도 충분합니다.</td></tr>
+    <tr><td><code>NoobAI-XL-Vpred-v1.0</code></td><td>SDXL</td><td>v-pred</td><td><code>noob</code>, <code>noob-hq</code></td><td>색감이 강하고 태그를 잘 따르지만 그림체 편차가 큽니다. <strong>상업적 이용 금지</strong>.</td></tr>
+    <tr><td><code>NoobAI-XL-v1.1</code></td><td>SDXL</td><td>eps</td><td><code>noob-eps</code></td><td>v-pred판보다 다루기 쉽고 Illustrious 계열 LoRA와 잘 맞습니다. <strong>상업적 이용 금지</strong>.</td></tr>
+    <tr><td><code>aamXLAnimeMix_v10</code></td><td>SDXL</td><td>eps</td><td>없음</td><td>프리셋이 없어서 아직 쓸 수 없습니다. 아래 <a href="#models-create">실습</a>에서 만들어 봅니다.</td></tr>
+  </tbody>
+</table>
+<p>앞의 두 파일은 <code>/Volumes/T7/VN-Pipeline/models/checkpoints/</code>에, 뒤의 두 파일은 엔진 폴더(<code>/Volumes/T7/ComfyUI/Installs/ComfyUI/ComfyUI/models/checkpoints/</code>)에 있습니다. 두 곳 모두 자동으로 인식합니다.</p>
+<p>현재 프리셋의 설정값은 다음과 같습니다.</p>
+<table>
+  <thead><tr><th>프리셋</th><th>샘플러 / 스케줄러</th><th>CFG</th><th>스텝</th><th>품질 태그</th></tr></thead>
+  <tbody>
+    <tr><td><code>wai</code></td><td>euler_ancestral / normal</td><td>6</td><td>28</td><td><code>masterpiece, best quality, amazing quality</code></td></tr>
+    <tr><td><code>noob</code></td><td>euler / normal (vpred 켬)</td><td>5</td><td>30</td><td><code>masterpiece, best quality, newest, absurdres, highres, very awa, safe</code></td></tr>
+    <tr><td><code>noob-hq</code></td><td>euler / normal (vpred 켬)</td><td>5</td><td>30</td><td>noob과 비슷 + 품질 LoRA <code>noobai_vpred_1_masterpieces_v23</code> 0.7</td></tr>
+    <tr><td><code>noob-eps</code></td><td>euler_ancestral / normal</td><td>5.5</td><td>28</td><td>noob과 같음</td></tr>
+  </tbody>
+</table>
+<p>NoobAI 프리셋의 네거티브에 <code>furry, anthro, mammal</code> 같은 태그가 들어 있는 이유는, NoobAI가 동물 캐릭터 그림도 함께 학습해서 가끔 그런 쪽으로 새기 때문입니다. <code>very awa</code>는 NoobAI 전용 미적 품질 태그이고, <code>safe</code>는 건전한 그림 쪽으로 유도하는 등급 태그입니다.</p>
+
+<h3 id="models-arch">SDXL과 SD1.5는 섞어 쓸 수 없습니다</h3>
+<p>SDXL과 SD1.5는 내부 구조가 다른 별개의 모델입니다. 그래서:</p>
+<ul>
+  <li><strong>LoRA는 같은 구조의 체크포인트에서만 동작</strong>합니다. 이 PC의 <code>add_detail</code>은 SD1.5용이라 SDXL 프리셋에서는 효과가 전혀 없습니다(호환성 배지 ❌).</li>
+  <li>SDXL은 약 100만 화소(1024×1024, 832×1216 등)에서 가장 잘 그리고, SD1.5는 512×512 기준입니다. SD1.5 모델로 832×1216을 그리면 몸이 두 개로 늘어나는 등 쉽게 깨집니다.</li>
+  <li>Civitai 모델 페이지의 <strong>Base Model</strong> 항목으로 구분합니다. <code>Illustrious</code>, <code>NoobAI</code>, <code>Pony</code>, <code>SDXL 1.0</code>은 모두 SDXL 계열이고, <code>SD 1.5</code>는 SD1.5입니다. <code>Flux</code>, <code>SD 3.5</code> 같은 다른 구조의 모델은 이 앱에서 지원하지 않습니다.</li>
+  <li>파일 크기로도 짐작할 수 있습니다. SDXL 체크포인트는 보통 6.5~7GB, SD1.5는 2~4GB입니다.</li>
+  <li>모델·LoRA 탭의 체크포인트 표에 파일에서 직접 읽어 낸 구조(arch)가 표시됩니다.</li>
+</ul>
+
+<h3 id="models-vpred">eps와 v-pred</h3>
+<p>이미지 생성 모델은 노이즈를 조금씩 걷어 내며 그림을 만듭니다. 이때 모델이 매 단계 무엇을 예측하도록 학습했는지에 따라 두 종류로 나뉩니다.</p>
+<ul>
+  <li><strong>eps(epsilon)</strong>: "섞여 있는 노이즈"를 예측합니다. 대부분의 모델이 이 방식이며 따로 신경 쓸 것이 없습니다.</li>
+  <li><strong>v-pred(v-prediction)</strong>: 노이즈와 그림을 섞은 값을 예측합니다. NoobAI-XL Vpred는 이 방식에 ZTSNR(완전한 노이즈에서 출발하는 학습)을 더해 <strong>진짜 검정·흰색과 선명한 색, 강한 명암</strong>을 표현할 수 있습니다.</li>
+</ul>
+<p>v-pred 모델은 생성할 때도 "이 모델은 v-pred"라고 알려 줘야 합니다. 프리셋의 <strong>vpred</strong>를 켜면 앱이 자동으로 v-pred 샘플링 설정(<code>v_prediction</code> + ZTSNR)과 과포화를 막는 RescaleCFG(0.7)를 넣어 줍니다. 여기에 더해 다음을 지키세요.</p>
+<ul>
+  <li><strong>샘플러는 <code>euler</code></strong>를 씁니다. NoobAI 공식 권장이며, Euler a(<code>euler_ancestral</code>)나 SDE 계열은 색이 깨지거나 지저분해지기 쉽습니다.</li>
+  <li>CFG는 <strong>4~5.5</strong>, 스텝은 <strong>28~35</strong>, 스케줄러는 <code>normal</code>이 무난합니다.</li>
+</ul>
+<table>
+  <thead><tr><th>잘못된 설정</th><th>나타나는 증상</th></tr></thead>
+  <tbody>
+    <tr><td>v-pred 모델인데 vpred가 꺼짐</td><td>회색으로 바랜 색, 대비가 없는 흐릿한 그림, 형체가 불분명한 얼룩</td></tr>
+    <tr><td>eps 모델인데 vpred가 켜짐</td><td>지나치게 어둡거나 새까만 그림, 색이 깨진 얼룩</td></tr>
+    <tr><td>vpred는 켰지만 샘플러가 euler가 아니거나 CFG가 7 이상</td><td>과포화, 타 버린 색, 지글거리는 노이즈</td></tr>
+  </tbody>
+</table>
+<p><strong>자동 감지</strong>: 앱은 체크포인트 파일의 헤더를 읽어 v-pred 여부를 판단합니다. <code>NoobAI-XL-Vpred-v1.0</code>은 파일 안에 v-pred 표시가 있어 자동으로 감지됩니다. 하지만 v-pred 모델을 섞어 만든 일부 모델은 이 표시가 빠져 있어 eps로 보일 수 있습니다. 파일 이름이나 배포 페이지에 <code>vpred</code>, <code>v-pred</code>, <code>V-Prediction</code>이라고 적혀 있으면 감지 결과와 상관없이 vpred를 켜세요.</p>
+
+<h3 id="models-find">모델 찾기와 내려받기</h3>
+<h4>Civitai (civitai.com)</h4>
+<ol>
+  <li>Models 메뉴에서 필터를 겁니다: Model types = <strong>Checkpoint</strong>, Base model = <strong>Illustrious</strong> 또는 <strong>NoobAI</strong>. 이 PC의 LoRA들과 잘 맞고 Danbooru 태그를 잘 이해합니다.</li>
+  <li>모델 페이지에서 확인할 것:
+    <ul>
+      <li>오른쪽 정보 영역의 <strong>Base Model</strong>(위의 구조 구분)</li>
+      <li>위쪽 <strong>버전 탭</strong>: 보통 최신 버전을 고릅니다. 버전마다 권장 설정과 파일이 다를 수 있습니다.</li>
+      <li>파일 형식과 크기: <strong>SafeTensor</strong>, 6.5GB 안팎(fp16 pruned)</li>
+      <li>본문 설명의 <strong>권장 설정</strong>(아래 <a href="#models-page">읽는 법</a> 참고)</li>
+      <li><strong>라이선스·사용 권한</strong> 표시(<a href="#license">라이선스 주의</a> 참고)</li>
+    </ul>
+  </li>
+  <li>Download 버튼을 오른쪽 클릭해 <strong>링크 주소 복사</strong>를 합니다. 주소는 <code>https://civitai.com/api/download/models/123456</code> 같은 형태입니다.</li>
+  <li>VN Studio의 <strong>모델·LoRA</strong> 탭 → <strong>URL로 다운로드</strong>에 붙여 넣고, 폴더를 <code>checkpoints</code>로 고른 뒤 시작합니다. 진행률이 표시되며, 창을 닫아도 다운로드는 계속됩니다.</li>
+</ol>
+<p>로그인해야 받을 수 있는 모델이면 오류가 납니다. Civitai 계정 설정(Account Settings)의 <strong>API Keys</strong>에서 키를 만들어 다운로드 폼의 <strong>Civitai 토큰</strong> 칸에 넣어 두면, civitai.com 주소에 자동으로 붙여 받습니다. 토큰은 이 PC의 <code>config/settings.json</code>에만 저장되며 다른 사람에게 보여 주면 안 됩니다.</p>
+<h4>Hugging Face (huggingface.co)</h4>
+<ul>
+  <li>모델 저장소의 <strong>Files and versions</strong> 탭에서 <code>.safetensors</code> 파일을 찾습니다.</li>
+  <li>앱으로 받으려면 <strong>직접 다운로드 주소</strong>가 필요합니다: <code>https://huggingface.co/<em>저장소</em>/resolve/main/<em>파일이름</em>.safetensors</code>. 주소에 <code>/blob/</code>이 들어 있으면 파일이 아니라 웹 페이지이므로 <code>/resolve/</code>로 바꾸세요.</li>
+  <li>라이선스 동의나 로그인이 필요한 저장소(gated)는 브라우저에서 직접 받은 뒤 아래처럼 폴더에 넣으세요.</li>
+</ul>
+<h4>직접 넣기</h4>
+<ol>
+  <li>모델·LoRA 탭의 [모델 폴더 열기]로 <code>/Volumes/T7/VN-Pipeline/models/checkpoints/</code>를 엽니다.</li>
+  <li>받은 파일을 넣습니다. 하위 폴더로 정리해도 됩니다(예: <code>illustrious/모델.safetensors</code>).</li>
+  <li>[목록 새로고침]을 누르면 체크포인트 표에 나타납니다. 엔진은 보통 재시작 없이 새 파일을 인식하지만, 생성할 때 파일을 찾지 못한다는 오류가 나면 엔진을 [재시작]하세요.</li>
+</ol>
+<div class="callout warn">
+  <p><strong><code>.safetensors</code> 파일을 받으세요.</strong> <code>.ckpt</code>·<code>.pt</code> 형식은 파일 안에 실행 코드를 숨길 수 있어, 출처가 확실할 때만 써야 합니다. 체크포인트 하나가 6~7GB이므로 T7의 남은 용량도 확인하세요.</p>
+</div>
+
+<h3 id="models-page">모델 페이지의 권장 설정 읽는 법</h3>
+<p>모델 페이지 본문에는 보통 이런 식으로 권장 설정이 적혀 있습니다(형식 설명용 예시).</p>
+<pre><code>Sampler: Euler a
+Steps: 20-30
+CFG scale: 5-7
+Clip skip: 2
+Resolution: 832x1216, 1024x1024, 1216x832
+Positive: masterpiece, best quality, amazing quality
+Negative: bad quality, worst quality, worst detail, sketch, censor
+VAE: baked in
+Hires fix: 1.5x, denoise 0.35-0.45</code></pre>
+<p>이 값들을 프리셋에 이렇게 옮깁니다.</p>
+<table>
+  <thead><tr><th>페이지 표기</th><th>프리셋 / 앱의 칸</th></tr></thead>
+  <tbody>
+    <tr><td>Euler a</td><td>샘플러 <code>euler_ancestral</code>, 스케줄러 <code>normal</code></td></tr>
+    <tr><td>Euler</td><td>샘플러 <code>euler</code>, 스케줄러 <code>normal</code></td></tr>
+    <tr><td>DPM++ 2M Karras</td><td>샘플러 <code>dpmpp_2m</code>, 스케줄러 <code>karras</code></td></tr>
+    <tr><td>DPM++ 2M SDE Karras</td><td>샘플러 <code>dpmpp_2m_sde</code>, 스케줄러 <code>karras</code></td></tr>
+    <tr><td>DPM++ SDE Karras</td><td>샘플러 <code>dpmpp_sde</code>, 스케줄러 <code>karras</code></td></tr>
+    <tr><td>DPM++ 3M SDE Exponential</td><td>샘플러 <code>dpmpp_3m_sde</code>, 스케줄러 <code>exponential</code></td></tr>
+    <tr><td>UniPC / DDIM</td><td>샘플러 <code>uni_pc</code> / <code>ddim</code>, 스케줄러 <code>normal</code></td></tr>
+    <tr><td>Steps 20-30</td><td>스텝: 범위의 중간~위쪽(예: 28)</td></tr>
+    <tr><td>CFG 5-7</td><td>CFG: 범위의 중간(예: 6)부터 시작</td></tr>
+    <tr><td>Positive (품질 태그)</td><td>품질 태그에 그대로 복사</td></tr>
+    <tr><td>Negative</td><td>기본 네거티브에 복사한 뒤, 건전한 결과를 원하면 <code>nsfw</code> 추가</td></tr>
+    <tr><td>Resolution</td><td>생성할 때의 크기 선택(세로 832×1216 등)</td></tr>
+    <tr><td>Hires fix 배율·denoise</td><td>모델·LoRA 탭의 전역 설정(하이레즈 배율·강도). 모든 프리셋에 공통으로 적용됩니다</td></tr>
+    <tr><td>v-pred, zsnr, RescaleCFG 언급</td><td>vpred 켜기</td></tr>
+    <tr><td>Recommended LoRA</td><td>기본 LoRA에 추가</td></tr>
+    <tr><td>Clip skip</td><td>이 앱에는 해당 설정이 없습니다. SDXL 계열에서는 대개 결과 차이가 작으니 무시해도 됩니다</td></tr>
+    <tr><td>VAE: baked in</td><td>이 앱은 항상 체크포인트에 내장된 VAE를 씁니다. 별도 VAE가 필수인 모델은 색이 바래 보일 수 있습니다</td></tr>
+  </tbody>
+</table>
+<p>본문에 설정이 없으면 페이지의 예시 이미지를 클릭해 보세요. 오른쪽에 그 이미지를 만든 샘플러·CFG·스텝·프롬프트가 나오는 경우가 많습니다.</p>
+
+<h3 id="models-preset">프리셋의 각 항목</h3>
+<table>
+  <thead><tr><th>항목</th><th>의미</th><th>권장값</th></tr></thead>
+  <tbody>
+    <tr><td>프리셋 이름(ID)</td><td>내부 이름입니다. 캐릭터 설정과 CLI(<code>--model</code>)가 이 이름으로 프리셋을 가리키며, 만든 뒤에는 바꿀 수 없습니다.</td><td>영문 소문자·숫자·<code>-</code>·<code>_</code>, 40자 이내 (예: <code>aam</code>, <code>wai-flat</code>)</td></tr>
+    <tr><td>표시 이름</td><td>목록에 보이는 이름(한글 가능)</td><td>모델명 + 특징</td></tr>
+    <tr><td>체크포인트</td><td>사용할 모델 파일</td><td>SDXL 계열</td></tr>
+    <tr><td>vpred</td><td>v-pred 모델이면 켭니다</td><td>자동 감지값, 단 배포 페이지가 우선</td></tr>
+    <tr><td>샘플러</td><td>노이즈를 걷어 내는 계산 방법</td><td>eps: <code>euler_ancestral</code>, <code>dpmpp_2m</code> / v-pred: <code>euler</code></td></tr>
+    <tr><td>스케줄러</td><td>단계마다 노이즈를 얼마나 줄일지 정하는 일정</td><td>euler 계열은 <code>normal</code>, DPM++ 계열은 <code>karras</code></td></tr>
+    <tr><td>CFG</td><td>프롬프트를 얼마나 강하게 따를지. 높으면 색이 진하고 딱딱해지며, 낮으면 흐릿하고 프롬프트를 덜 따릅니다</td><td>eps 5~7, v-pred 4~5.5 (허용 범위 1~20)</td></tr>
+    <tr><td>스텝</td><td>1차 생성의 반복 횟수. 832×1216에서 스텝당 약 3~4초</td><td>25~30 (허용 범위 5~80)</td></tr>
+    <tr><td>품질 태그</td><td>모든 긍정 프롬프트 끝에 자동으로 붙습니다</td><td>모델 페이지 권장 문구 그대로</td></tr>
+    <tr><td>기본 네거티브</td><td>모든 부정 프롬프트 앞에 자동으로 붙습니다</td><td>모델 페이지 권장값 + <code>nsfw</code>, 짧게</td></tr>
+    <tr><td>기본 LoRA</td><td>이 프리셋으로 만드는 모든 그림에 적용</td><td>모델 전용 품질·안정화 LoRA만</td></tr>
+    <tr><td>노트</td><td>특징·주의사항 메모. 생성 탭에서 툴팁으로 보입니다</td><td>라이선스, 용도</td></tr>
+  </tbody>
+</table>
+<p><strong>샘플러 고르는 감각</strong>: 이름에 <code>ancestral</code>이나 <code>sde</code>가 붙은 샘플러는 매 단계 새 노이즈를 조금씩 섞어 결과가 더 다채롭고 생동감 있지만, 스텝 수를 바꾸면 그림도 달라집니다. <code>euler</code>, <code>dpmpp_2m</code>, <code>uni_pc</code>는 한 결과로 수렴해 안정적입니다. 어느 쪽이든 시드가 같으면 같은 그림이 나옵니다.</p>
+<p>프리셋의 샘플러·스케줄러·스텝은 <strong>1차 생성</strong>에만 쓰입니다. 하이레즈와 얼굴·손 보정은 안정성을 위해 항상 <code>euler</code>를 쓰고, CFG는 프리셋 값을 따릅니다.</p>
+
+<h3 id="models-create">실습: aamXLAnimeMix_v10 프리셋 만들기</h3>
+<ol>
+  <li><strong>모델·LoRA</strong> 탭의 체크포인트 표에서 <code>aamXLAnimeMix_v10.safetensors</code> 행을 찾습니다. 사용 중인 프리셋이 없으므로 [프리셋 만들기] 버튼이 보입니다. (프리셋 카드 목록의 [새 프리셋]을 누르고 체크포인트를 골라도 같습니다.)</li>
+  <li>앱이 파일을 읽어 <strong>SDXL / eps</strong>로 감지하고, vpred를 끈 상태로 eps 기본값을 채웁니다: 샘플러 <code>euler_ancestral</code>, 스케줄러 <code>normal</code>, CFG 6, 28스텝, 품질 태그 <code>masterpiece, best quality, amazing quality</code>.</li>
+  <li><strong>프리셋 이름(ID)</strong>을 <code>aam</code>, <strong>표시 이름</strong>을 <code>AAM XL AnimeMix</code>로 정합니다.</li>
+  <li>Civitai에서 이 모델의 배포 페이지를 찾아 권장 설정을 확인하고, 위의 <a href="#models-page">대응표</a>대로 샘플러·CFG·스텝·품질 태그를 고칩니다. 페이지에 설정이 없으면 기본값 그대로 두고 시작해도 됩니다.</li>
+  <li>기본 네거티브는 짧게 시작합니다: <code>worst quality, low quality, lowres, bad anatomy, bad hands, signature, watermark, nsfw</code></li>
+  <li>노트에 "테스트 중, 라이선스 확인 필요"처럼 적고 [저장]합니다.</li>
+  <li><strong>비교 테스트</strong>: 생성 탭에서 같은 프롬프트, 고정 시드(예: <code>12345</code>), 빠른 미리보기로 <code>wai</code>와 <code>aam</code>을 한 장씩 뽑아 갤러리에서 번갈아 봅니다. 마음에 안 들면 CFG를 ±1, 샘플러를 하나씩 바꿔 가며 다시 비교합니다. <strong>한 번에 한 가지만 바꿔야</strong> 무엇이 효과가 있었는지 알 수 있습니다.</li>
+  <li>결과가 좋으면 캐릭터의 모델 프리셋으로 지정하거나, 프리셋 카드에서 [기본으로 지정]을 누릅니다.</li>
+</ol>
+<div class="callout tip">
+  <p>aamXLAnimeMix는 파일 이름이나 정보로 계열(Illustrious·NoobAI 등)을 알 수 없는 모델입니다. 이런 모델에서는 LoRA 호환성 배지가 구조(SDXL)만 맞으면 ✅로 표시되므로, Illustrious용 LoRA가 실제로는 약하게 들 수 있습니다. 또 Illustrious·NoobAI 계열이 아닌 모델은 Danbooru 태그를 이해하는 정도가 다를 수 있으니, 결과를 보고 판단하세요.</p>
+</div>
+
+<h3 id="models-manage">프리셋 관리 팁</h3>
+<ul>
+  <li>실험할 때는 원본을 고치지 말고 [복제]해서 바꿔 보세요(예: <code>wai</code> → <code>wai-cfg5</code>). 비교가 끝나면 필요 없는 쪽을 지우면 됩니다.</li>
+  <li>기본 프리셋과 마지막 남은 프리셋은 삭제할 수 없습니다.</li>
+  <li>캐릭터는 프리셋을 이름으로 기억합니다. 캐릭터가 쓰던 프리셋을 지우면 그 캐릭터는 자동으로 <strong>기본 프리셋</strong>을 쓰도록 바뀌므로(오류는 나지 않음) 그림체가 달라질 수 있습니다. 지우기 전에 캐릭터 탭에서 모델 프리셋을 원하는 것으로 바꿔 두세요.</li>
+  <li>프리셋에 연결된 체크포인트 파일의 이름을 바꾸거나 옮기면 그 프리셋은 동작하지 않습니다. 파일을 바꿨다면 프리셋의 체크포인트도 다시 고르세요.</li>
+  <li>프리셋은 <code>config/presets.json</code>에 저장됩니다. 잘 맞춘 설정은 이 파일을 백업해 두세요.</li>
+</ul>
+</section>

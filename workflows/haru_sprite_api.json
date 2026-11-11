@@ -1,0 +1,1137 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "waiIllustriousSDXL_v170.safetensors"
+    },
+    "_meta": {
+      "title": "모델 로드"
+    }
+  },
+  "2": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "긍정 프롬프트"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "bad quality, worst quality, worst detail, sketch, censor, nsfw, bad hands, extra fingers, missing fingers"
+    },
+    "_meta": {
+      "title": "부정 프롬프트"
+    }
+  },
+  "4": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1216,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "빈 캔버스"
+    }
+  },
+  "5": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "2",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "latent_image": [
+        "4",
+        0
+      ],
+      "seed": 20261108,
+      "steps": 28,
+      "cfg": 6.0,
+      "sampler_name": "euler_ancestral",
+      "scheduler": "normal",
+      "denoise": 1.0
+    },
+    "_meta": {
+      "title": "1차 생성 (기본 포즈)"
+    }
+  },
+  "6": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "5",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "디코드"
+    }
+  },
+  "7": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "RealESRGAN_x4plus_anime_6B.pth"
+    },
+    "_meta": {
+      "title": "업스케일러 로드"
+    }
+  },
+  "8": {
+    "class_type": "ImageUpscaleWithModel",
+    "inputs": {
+      "upscale_model": [
+        "7",
+        0
+      ],
+      "image": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "업스케일"
+    }
+  },
+  "9": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 1248,
+      "height": 1824,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "리사이즈"
+    }
+  },
+  "10": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "9",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "인코드"
+    }
+  },
+  "11": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "2",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "latent_image": [
+        "10",
+        0
+      ],
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.4
+    },
+    "_meta": {
+      "title": "하이레즈 리파인 (기본 포즈)"
+    }
+  },
+  "12": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "11",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "디코드"
+    }
+  },
+  "13": {
+    "class_type": "UltralyticsDetectorProvider",
+    "inputs": {
+      "model_name": "bbox/face_yolov8m.pt"
+    },
+    "_meta": {
+      "title": "디텍터"
+    }
+  },
+  "14": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "12",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "2",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.35,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": false,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "얼굴 보정 (기본 포즈)"
+    }
+  },
+  "15": {
+    "class_type": "UltralyticsDetectorProvider",
+    "inputs": {
+      "model_name": "bbox/hand_yolov8s.pt"
+    },
+    "_meta": {
+      "title": "디텍터"
+    }
+  },
+  "16": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "14",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "2",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.4,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": false,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "15",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "손 보정 (기본 포즈)"
+    }
+  },
+  "17": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "16",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_base"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  },
+  "18": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, closed mouth, light smile, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "표정 프롬프트 neutral"
+    }
+  },
+  "19": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "18",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.55,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": true,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "표정: neutral"
+    }
+  },
+  "20": {
+    "class_type": "LoadBackgroundRemovalModel",
+    "inputs": {
+      "bg_removal_name": "birefnet.safetensors"
+    },
+    "_meta": {
+      "title": "배경제거 모델"
+    }
+  },
+  "21": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "20",
+        0
+      ],
+      "image": [
+        "19",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "배경 제거"
+    }
+  },
+  "22": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "마스크 반전"
+    }
+  },
+  "23": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "19",
+        0
+      ],
+      "alpha": [
+        "22",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "투명 합성"
+    }
+  },
+  "24": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "23",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_neutral"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  },
+  "25": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, smile, open mouth, happy, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "표정 프롬프트 smile"
+    }
+  },
+  "26": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "25",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.55,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": true,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "표정: smile"
+    }
+  },
+  "27": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "20",
+        0
+      ],
+      "image": [
+        "26",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "배경 제거"
+    }
+  },
+  "28": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "27",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "마스크 반전"
+    }
+  },
+  "29": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "26",
+        0
+      ],
+      "alpha": [
+        "28",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "투명 합성"
+    }
+  },
+  "30": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "29",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_smile"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  },
+  "31": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, blush, embarrassed, looking away, closed mouth, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "표정 프롬프트 blush"
+    }
+  },
+  "32": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "31",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.6,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": true,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "표정: blush"
+    }
+  },
+  "33": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "20",
+        0
+      ],
+      "image": [
+        "32",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "배경 제거"
+    }
+  },
+  "34": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "33",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "마스크 반전"
+    }
+  },
+  "35": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "32",
+        0
+      ],
+      "alpha": [
+        "34",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "투명 합성"
+    }
+  },
+  "36": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "35",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_blush"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  },
+  "37": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, angry, pout, v-shaped eyebrows, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "표정 프롬프트 angry"
+    }
+  },
+  "38": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "37",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.6,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": true,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "표정: angry"
+    }
+  },
+  "39": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "20",
+        0
+      ],
+      "image": [
+        "38",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "배경 제거"
+    }
+  },
+  "40": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "39",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "마스크 반전"
+    }
+  },
+  "41": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "38",
+        0
+      ],
+      "alpha": [
+        "40",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "투명 합성"
+    }
+  },
+  "42": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "41",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_angry"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  },
+  "43": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, sad, frown, teary eyes, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "표정 프롬프트 sad"
+    }
+  },
+  "44": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "43",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.6,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": true,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "표정: sad"
+    }
+  },
+  "45": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "20",
+        0
+      ],
+      "image": [
+        "44",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "배경 제거"
+    }
+  },
+  "46": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "45",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "마스크 반전"
+    }
+  },
+  "47": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "44",
+        0
+      ],
+      "alpha": [
+        "46",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "투명 합성"
+    }
+  },
+  "48": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "47",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_sad"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  },
+  "49": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "1",
+        1
+      ],
+      "text": "1girl, solo, long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender, school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers, surprised, open mouth, wide-eyed, full body, standing, looking at viewer, arms at sides, white background, simple background, masterpiece, best quality, amazing quality"
+    },
+    "_meta": {
+      "title": "표정 프롬프트 surprised"
+    }
+  },
+  "50": {
+    "class_type": "FaceDetailer",
+    "inputs": {
+      "image": [
+        "16",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "clip": [
+        "1",
+        1
+      ],
+      "vae": [
+        "1",
+        2
+      ],
+      "positive": [
+        "49",
+        0
+      ],
+      "negative": [
+        "3",
+        0
+      ],
+      "guide_size": 512,
+      "guide_size_for": true,
+      "max_size": 1024,
+      "seed": 20261108,
+      "steps": 14,
+      "cfg": 6.0,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.6,
+      "feather": 5,
+      "noise_mask": true,
+      "force_inpaint": true,
+      "bbox_threshold": 0.5,
+      "bbox_dilation": 10,
+      "bbox_crop_factor": 3.0,
+      "sam_detection_hint": "center-1",
+      "sam_dilation": 0,
+      "sam_threshold": 0.93,
+      "sam_bbox_expansion": 0,
+      "sam_mask_hint_threshold": 0.7,
+      "sam_mask_hint_use_negative": "False",
+      "drop_size": 10,
+      "bbox_detector": [
+        "13",
+        0
+      ],
+      "wildcard": "",
+      "cycle": 1
+    },
+    "_meta": {
+      "title": "표정: surprised"
+    }
+  },
+  "51": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "20",
+        0
+      ],
+      "image": [
+        "50",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "배경 제거"
+    }
+  },
+  "52": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "51",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "마스크 반전"
+    }
+  },
+  "53": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "50",
+        0
+      ],
+      "alpha": [
+        "52",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "투명 합성"
+    }
+  },
+  "54": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "53",
+        0
+      ],
+      "filename_prefix": "haru/sprite/haru_surprised"
+    },
+    "_meta": {
+      "title": "저장"
+    }
+  }
+}

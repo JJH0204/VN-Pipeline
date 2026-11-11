@@ -1,0 +1,34 @@
+{
+  "id": "haru",
+  "name": "하루 (샘플 히로인)",
+  "count": "1girl, solo",
+  "appearance": "long hair, light brown hair, side braid, hair ribbon, amber eyes, medium breasts, slender",
+  "outfit": "school uniform, white serafuku, navy sailor collar, red neckerchief, pleated skirt, navy skirt, black thighhighs, brown loafers",
+  "style": "",
+  "negative": "",
+  "seed": 20261108,
+  "model": "wai",
+  "loras": [],
+  "concept_pose": "upper body, looking at viewer, smile, simple background, white background",
+  "sprite_pose": "full body, standing, looking at viewer, arms at sides, white background, simple background",
+  "expressions": {
+    "neutral": "closed mouth, light smile",
+    "smile": "smile, open mouth, happy",
+    "blush": {
+      "prompt": "blush, embarrassed, looking away, closed mouth",
+      "denoise": 0.6
+    },
+    "angry": {
+      "prompt": "angry, pout, v-shaped eyebrows",
+      "denoise": 0.6
+    },
+    "sad": {
+      "prompt": "sad, frown, teary eyes",
+      "denoise": 0.6
+    },
+    "surprised": {
+      "prompt": "surprised, open mouth, wide-eyed",
+      "denoise": 0.6
+    }
+  }
+}

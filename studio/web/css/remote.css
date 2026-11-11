@@ -1,0 +1,132 @@
+/* 원격 접속(Tailscale) — 상단 바 '원격' 배지, 모델·LoRA › 전역 설정의 '원격 접속' 패널, 원격일 때 로컬 전용 버튼 숨김.
+   색은 app.css의 디자인 토큰만 쓴다(다크/라이트 자동). */
+
+/* 원격으로 보고 있으면 Mac에서만 의미 있는 버튼(폴더 열기·Finder 등)을 숨긴다. 요소에 data-local-only 를 붙이면 된다 */
+.is-remote [data-local-only] { display: none !important; }
+
+/* ============ 상단 바 배지 ============ */
+.remote-badge {
+  display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 13px; flex: none;
+  max-width: 220px; min-width: 0; background: var(--info-soft); color: var(--info);
+  font-size: 12px; font-weight: 650; text-decoration: none; white-space: nowrap;
+}
+.remote-badge:hover { filter: brightness(1.12); }
+.remote-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px var(--info-soft); flex: none; }
+.remote-badge-text { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* ============ 원격 접속 패널 ============ */
+/* 바로 가기(#/models/settings/remote)로 스크롤할 때 상단 바 + 모델·LoRA 하위 탭(sticky) 아래에 제목이 보이도록 */
+.remote-panel { margin-top: 16px; scroll-margin-top: calc(var(--header-h) + 76px); }
+.remote-panel .panel-head .badge { margin-left: 2px; }
+.rm-body { display: flex; flex-direction: column; gap: 12px; }
+
+.rm-notice {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: var(--radius);
+  font-size: 13px; line-height: 1.6; background: var(--info-soft); border: 1px solid color-mix(in srgb, var(--info) 25%, transparent);
+}
+.rm-notice.is-warn { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.rm-notice.is-error { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.rm-notice-icon {
+  width: 20px; height: 20px; border-radius: 50%; flex: none; display: grid; place-items: center; margin-top: 1px;
+  font-size: 12px; font-weight: 800; color: #fff; background: var(--info);
+}
+.rm-notice.is-warn .rm-notice-icon { background: var(--warn); color: #1b1405; }
+.rm-notice.is-error .rm-notice-icon { background: var(--bad); }
+.rm-notice-body { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rm-notice-actions { margin-top: 8px; }
+
+.rm-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: 18px 24px; align-items: start; }
+.rm-main, .rm-side { min-width: 0; }
+
+/* 준비 상태 점검 목록 */
+.rm-checks { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.rm-check {
+  display: grid; grid-template-columns: 22px 136px minmax(0, 1fr); gap: 4px 10px; align-items: baseline;
+  padding: 10px 12px; border-top: 1px solid var(--border); font-size: 13px;
+}
+.rm-check:first-child { border-top: none; }
+.rm-check-icon { font-size: 13px; line-height: 1; text-align: center; }
+.rm-check.is-off .rm-check-icon, .rm-check.is-unknown .rm-check-icon { color: var(--text-3); }
+.rm-check-label { display: inline-flex; align-items: center; gap: 6px; font-weight: 650; color: var(--text-2); }
+.rm-check-value { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
+.rm-check.is-warn .rm-check-value { color: var(--warn); }
+.rm-check.is-bad .rm-check-value { color: var(--bad); }
+.rm-check.is-off .rm-check-value { color: var(--text-3); }
+.rm-check-fix { grid-column: 2 / -1; font-size: 12.5px; color: var(--text-2); line-height: 1.65; }
+.rm-check-fix ol { margin: 8px 0 6px; padding-left: 20px; }
+.rm-check-fix li { margin: 2px 0; }
+.rm-check.is-warn { background: color-mix(in srgb, var(--warn-soft) 55%, transparent); }
+.rm-path { font-family: var(--mono); font-size: 11.5px; }
+.rm-admin-btn { margin-top: 2px; }
+
+.rm-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.rm-reason { font-size: 12px; color: var(--text-3); line-height: 1.5; flex: 1 1 200px; min-width: 0; }
+.rm-result { margin-top: 12px; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.55; background: var(--ok-soft); }
+.rm-result.is-error { background: var(--bad-soft); }
+.rm-result-msg { overflow-wrap: anywhere; }
+.rm-result-links { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; font-size: 12.5px; overflow-wrap: anywhere; }
+.rm-result-out summary { cursor: pointer; font-size: 12px; color: var(--text-2); margin-top: 6px; }
+.rm-result-out pre {
+  margin: 6px 0 0; padding: 8px 10px; max-height: 220px; overflow: auto; border-radius: var(--radius-sm);
+  background: var(--panel-2); font-family: var(--mono); font-size: 12px; white-space: pre-wrap; word-break: break-word;
+}
+
+/* 허용 로그인 */
+.rm-logins { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.rm-login-chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 4px 0 11px; border-radius: 15px; max-width: 100%;
+  background: var(--panel-2); border: 1px solid var(--border); font-size: 12.5px;
+}
+.rm-login-chip:not(:has(.icon-btn)) { padding-right: 11px; }
+.rm-login-id { font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; min-width: 0; }
+.rm-login-name { color: var(--text-3); white-space: nowrap; }
+.rm-login-add { max-width: 460px; }
+.rm-login-save { display: flex; gap: 8px; justify-content: flex-end; max-width: 460px; }
+
+/* 접속 주소 + QR */
+.rm-addr {
+  display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--panel-2);
+}
+.rm-addr .field-label { margin: 0; }
+.rm-addr .field-label .badge { margin-left: auto; }
+.rm-url-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rm-url {
+  flex: 1 1 100%; min-width: 0; padding: 7px 9px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong);
+  background: var(--input-bg); font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all;
+}
+.rm-qr {
+  position: relative; align-self: center; width: 100%; max-width: 220px; aspect-ratio: 1 / 1; border-radius: 12px;
+  background: #fff; display: grid; place-items: center; overflow: hidden; box-shadow: var(--shadow-sm);
+}
+.rm-qr svg { display: block; width: 100%; height: 100%; }
+.rm-qr.is-pending svg { opacity: 0.28; }
+.rm-qr-overlay {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 5px 10px; border-radius: 8px;
+  background: rgba(13, 15, 20, 0.82); color: #fff; font-size: 12px; font-weight: 650; white-space: nowrap;
+}
+.rm-qr.is-failed { background: var(--panel-3); aspect-ratio: auto; min-height: 90px; }
+.rm-qr-fail { padding: 12px; font-size: 12px; color: var(--text-2); text-align: center; }
+.rm-qr-cap { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; color: var(--text-3); line-height: 1.5; }
+.rm-qr-cap .tip-i { margin-top: 1px; }
+
+.rm-foot { margin: 4px 0 0; font-size: 12px; color: var(--text-3); line-height: 1.65; }
+
+/* ============ 좁은 화면 / 터치 ============ */
+@media (max-width: 900px) {
+  .rm-layout { grid-template-columns: minmax(0, 1fr); }
+  .rm-qr { max-width: 200px; }
+}
+@media (max-width: 600px) {
+  .remote-badge { max-width: 132px; padding: 0 9px; }
+  .rm-check { grid-template-columns: 22px minmax(0, 1fr); }
+  .rm-check-label, .rm-check-value, .rm-check-fix { grid-column: 2; }
+  .rm-login-add, .rm-login-save { max-width: none; }
+}
+@media (pointer: coarse) {
+  .remote-panel .btn { min-height: 44px; }
+  .rm-login-chip { min-height: 36px; }
+  .rm-login-chip .icon-btn { width: 36px; height: 36px; }
+  .rm-login-add input { height: 44px; font-size: 16px; }
+  .remote-badge { height: 32px; }
+}

@@ -1,0 +1,25 @@
+# VN-Pipeline 전용 모델 + 기존 공유 모델 폴더(LoRA 등) 함께 사용
+vn_pipeline:
+  base_path: /Volumes/T7/VN-Pipeline/models
+  is_default: true
+  checkpoints: checkpoints
+  loras: loras
+  vae: vae
+  upscale_models: upscale_models
+  background_removal: background_removal
+  ultralytics: ultralytics
+  ultralytics_bbox: ultralytics/bbox
+  ultralytics_segm: ultralytics/segm
+  controlnet: controlnet
+  embeddings: embeddings
+
+legacy_shared:
+  base_path: /Volumes/T7/ComfyUI/Shared/models
+  checkpoints: checkpoints
+  loras: loras
+  vae: vae
+  upscale_models: upscale_models
+  text_encoders: text_encoders
+  controlnet: controlnet
+  clip_vision: clip_vision
+  ipadapter: ipadapter

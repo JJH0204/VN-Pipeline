@@ -1,0 +1,17 @@
+# 모델·생성물·실행 데이터는 git에 넣지 않는다 (코드와 설정만 추적)
+/models/
+/output/
+/user/
+/input/
+/VN Studio.app/
+
+# 기기별 설정: 원격 접속 허용 계정·Civitai 토큰이 들어감. 없으면 vnlib/config.py가 기본값으로 만든다
+/config/settings.json
+/config/*.broken-*
+
+# 캐시·로그·임시 출력
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+/tags_out.json

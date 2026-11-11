@@ -1,0 +1,37 @@
+{
+  "noobai_vpred_1_masterpieces_v23.safetensors": {
+    "trigger": "masterpiece, very aesthetic",
+    "weight": 0.7,
+    "note": "NoobAI vpred 전용 품질 LoRA. noob 프리셋과 함께 사용."
+  },
+  "AddMicroDetails_Illustrious_v6.safetensors": {
+    "trigger": "addmicrodetails",
+    "weight": 0.5,
+    "note": "Illustrious 계열(WAI 등)용 디테일 강화 LoRA. 0.3~0.6 권장."
+  },
+  "detailed_hands_unhinged.safetensors": {
+    "trigger": "",
+    "weight": 0.6,
+    "note": "손 묘사 보정 LoRA (NoobAI 1.1 기반 학습)."
+  },
+  "badhands.safetensors": {
+    "trigger": "badhands",
+    "weight": 0.8,
+    "note": "SDXL 기본 모델용 '나쁜 손' 학습 LoRA. 보통 네거티브 쪽에서 쓰는 개념이라 일반 사용 시 효과 불확실."
+  },
+  "noobai_ep11_stabilizer_v0.178_fp16.safetensors": {
+    "trigger": "",
+    "weight": 0.5,
+    "note": "NoobAI eps 1.1용 안정화 LoRA."
+  },
+  "cknb02_stabilizer_v0.304a_fp16.safetensors": {
+    "trigger": "",
+    "weight": 0.5,
+    "note": "안정화 LoRA (SDXL)."
+  },
+  "add_detail.safetensors": {
+    "trigger": "",
+    "weight": 0.5,
+    "note": "SD1.5 전용 — 현재 SDXL 모델들과 호환되지 않음."
+  }
+}

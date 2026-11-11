@@ -1,0 +1,59 @@
+{
+  "wai": {
+    "label": "WAI-Illustrious v17 (기본 추천)",
+    "ckpt": "waiIllustriousSDXL_v170.safetensors",
+    "vpred": false,
+    "sampler": "euler_ancestral",
+    "scheduler": "normal",
+    "cfg": 6.0,
+    "steps": 28,
+    "quality": "masterpiece, best quality, amazing quality",
+    "negative": "bad quality, worst quality, worst detail, sketch, censor, nsfw, bad hands, extra fingers, missing fingers",
+    "loras": [],
+    "note": "깔끔한 애니 캐릭터 그림체. 손·팔다리가 안정적. 품질 태그와 네거티브는 짧게 유지할 것(길면 오히려 흐려짐)."
+  },
+  "noob": {
+    "label": "NoobAI-XL Vpred 1.0",
+    "ckpt": "NoobAI-XL-Vpred-v1.0.safetensors",
+    "vpred": true,
+    "sampler": "euler",
+    "scheduler": "normal",
+    "cfg": 5.0,
+    "steps": 30,
+    "quality": "masterpiece, best quality, newest, absurdres, highres, very awa, safe",
+    "negative": "nsfw, worst quality, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, mammal, anthro, furry, ambiguous form, feral, semi-anthro",
+    "loras": [],
+    "note": "v-prediction 모델(샘플러는 반드시 euler). 색감이 강하고 태그 이해도가 높지만 그림체 편차가 큼. 상업적 이용 금지 라이선스."
+  },
+  "noob-hq": {
+    "label": "NoobAI Vpred + 품질 LoRA",
+    "ckpt": "NoobAI-XL-Vpred-v1.0.safetensors",
+    "vpred": true,
+    "sampler": "euler",
+    "scheduler": "normal",
+    "cfg": 5.0,
+    "steps": 30,
+    "quality": "masterpiece, very aesthetic, best quality, newest, absurdres, highres, very awa, safe",
+    "negative": "nsfw, worst quality, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, mammal, anthro, furry, ambiguous form, feral, semi-anthro",
+    "loras": [
+      {
+        "name": "noobai_vpred_1_masterpieces_v23.safetensors",
+        "weight": 0.7
+      }
+    ],
+    "note": "noob + 같은 모델로 학습된 masterpieces LoRA. 테스트상 효과는 작음."
+  },
+  "noob-eps": {
+    "label": "NoobAI-XL 1.1 (eps)",
+    "ckpt": "NoobAI-XL-v1.1.safetensors",
+    "vpred": false,
+    "sampler": "euler_ancestral",
+    "scheduler": "normal",
+    "cfg": 5.5,
+    "steps": 28,
+    "quality": "masterpiece, best quality, newest, absurdres, highres, very awa, safe",
+    "negative": "nsfw, worst quality, old, early, low quality, lowres, signature, username, logo, bad hands, mutated hands, mammal, anthro, furry, ambiguous form, feral, semi-anthro",
+    "loras": [],
+    "note": "NoobAI eps(일반) 버전. vpred보다 다루기 쉽고 Illustrious 계열 LoRA와 잘 맞음. 상업적 이용 금지 라이선스."
+  }
+}

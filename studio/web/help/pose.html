@@ -1,0 +1,323 @@
+<section id="pose">
+<h2>포즈 따라 그리기 (ControlNet OpenPose)</h2>
+<p>3D 모델이나 참고 그림의 <strong>자세</strong>를 뼈대 그림(<strong>포즈 맵</strong>)으로 만들어 두고, 생성할 때 그 자세를 그대로 따라 그리게 하는 기능입니다. 프롬프트만으로는 "오른팔을 번쩍 들고 왼손은 허리에, 다리는 벌리고" 같은 자세를 정확히 정하기 어렵지만, 포즈를 붙이면 팔다리의 위치를 원하는 대로 정할 수 있습니다.</p>
+<ul>
+  <li><strong>포즈를 만드는 곳</strong>: <strong>프롬프트 추출</strong> 탭입니다. [3D 모델]에서는 모델의 뼈대로 바로 계산하고, [이미지]에서는 그림 속 인물의 자세를 감지합니다. 태그 추출과 같은 탭, 같은 3D 뷰어를 씁니다.</li>
+  <li><strong>포즈를 쓰는 곳</strong>: <strong>생성</strong> 탭의 <strong>포즈 (ControlNet)</strong> 묶음, <strong>캐릭터</strong> 탭의 생성하기 패널(시안·스프라이트·CG). 배경 탭에는 쓰지 않습니다.</li>
+  <li>포즈를 만드는 일은 Studio가 직접 하므로 <strong>엔진(ComfyUI)이 꺼져 있어도 됩니다.</strong> 포즈를 붙여 그림을 그리는 일은 엔진이 합니다.</li>
+  <li>태그 추출과 달리 포즈는 <strong>파일로 저장됩니다.</strong> 뼈대 그림과 원본(또는 3D 렌더)의 작은 미리보기가 <code>input/poses/</code>에 남습니다. 이 Mac 밖으로 전송되지는 않습니다(<a href="#pose-library">포즈 라이브러리</a>).</li>
+</ul>
+
+<h3 id="pose-quick">3분 사용법</h3>
+<ol>
+  <li><strong>프롬프트 추출</strong> 탭에서 [3D 모델]로 모델을 열거나, [이미지]로 자세가 잘 보이는 전신 그림을 넣습니다.</li>
+  <li><strong>3D</strong>: 애니메이션 클립·시간 슬라이더, [팔 내리기], 각도 버튼으로 자세를 잡고 [뼈대 보기]를 켜서 점이 관절 위에 있는지 확인합니다. <strong>포즈 크기</strong>를 만들 그림에 맞게 고른 뒤 [이 포즈로 생성…]을 누릅니다.<br>
+      <strong>이미지</strong>: [이 그림에서 포즈 감지]를 누르고, [뼈대 겹쳐 보기]로 뼈대가 인물과 맞는지 확인한 뒤 [생성 탭으로]를 누릅니다.</li>
+  <li>생성 탭의 <strong>포즈 (ControlNet)</strong> 묶음에 포즈 카드가 나타나고, 크기가 포즈 크기로 자동으로 맞춰집니다. <strong>강도</strong> 1.0, <strong>적용 구간(끝)</strong> 1.0, <strong>ControlNet</strong>은 NoobAI OpenPose 그대로 두세요.</li>
+  <li>프롬프트에는 캐릭터·옷·장소·표정을 적고, <strong>자세와 모순되는 태그는 뺍니다</strong>(포즈는 서 있는데 <code>sitting</code> 등). 구도 태그는 포즈의 프레이밍에 맞춥니다(<code>full body</code> / <code>upper body</code>). 자세한 요령은 <a href="#pose-prompt">프롬프트 팁</a>.</li>
+  <li>빠른 미리보기로 생성합니다. 포즈를 쓰면 1차 생성이 <strong>약 40% 느려집니다</strong>(실측: 빠른 미리보기 1장 약 100초 → 약 200초).</li>
+</ol>
+
+<h3 id="pose-what">ControlNet과 OpenPose가 하는 일</h3>
+<p><strong>ControlNet</strong>은 체크포인트 옆에 붙어서 "이런 모양으로 그려라"라는 그림 조건을 하나 더 알려 주는 보조 모델입니다. 그중 <strong>OpenPose</strong> 방식은 사람의 자세를 18개의 점(코·목·어깨·팔꿈치·손목·엉덩이·무릎·발목·눈·귀)과 그 점을 잇는 색깔 선으로 나타냅니다. 검은 바탕에 이 점과 선만 그린 그림이 <strong>포즈 맵</strong>이고, OpenPose ControlNet은 포즈 맵을 보고 인물의 머리·팔다리를 그 위치에 그리도록 그림을 이끕니다.</p>
+<table>
+  <thead><tr><th>무엇을</th><th>누가 정하나</th></tr></thead>
+  <tbody>
+    <tr><td>팔다리와 머리의 위치, 몸의 방향(앞·옆·뒤), 화면 속 인물의 크기와 자리</td><td><strong>포즈</strong></td></tr>
+    <tr><td>얼굴, 머리 모양·색, 옷, 표정, 소품, 장소, 조명, 그림체</td><td><strong>프롬프트</strong>·캐릭터 설정·프리셋·LoRA</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li><strong>뼈대에는 체형·옷 정보가 없습니다.</strong> 같은 포즈로 긴 드레스도, 반바지도 그릴 수 있습니다. 실측에서도 포즈를 붙인 뒤 긴 메이드 드레스·카페 배경 같은 프롬프트 내용이 그대로 지켜졌습니다.</li>
+  <li><strong>선 색은 부위를 구분합니다.</strong> 오른팔과 왼팔, 오른다리와 왼다리의 색이 달라서 ControlNet은 어느 쪽 팔을 들었는지 압니다. 왼쪽·오른쪽은 <strong>인물 기준</strong>이라, 정면을 보는 인물의 오른팔은 화면 왼쪽에 있습니다.</li>
+  <li><strong>얼굴 점(코·눈·귀)은 얼굴 방향을 알려 줍니다.</strong> 뒷모습이면 코·눈 점 없이 귀만, 옆모습이면 먼 쪽 눈·귀가 빠집니다. 그래서 같은 팔다리 모양이라도 앞모습인지 뒷모습인지 구분됩니다.</li>
+  <li><strong>손가락</strong>: 손 뼈대(손목 + 손가락마다 4점, 21점)가 있으면 손가락 방향까지 알려 줍니다. 없으면 손은 모델이 알아서 그립니다.</li>
+  <li><strong>표정은 정하지 않습니다.</strong> 얼굴 윤곽·입 모양 점은 쓰지 않으므로 표정은 프롬프트로 정합니다.</li>
+  <li>포즈는 <strong>1차 생성에만</strong> 적용됩니다. 하이레즈 리파인, 얼굴·손 보정은 포즈 없이 원래대로 돌아갑니다. 이미 자세가 잡힌 그림을 다듬는 단계라 포즈가 필요 없고, 붙이면 느려지기만 하기 때문입니다(<a href="#quality-pipeline">생성 과정</a>).</li>
+  <li>포즈도 그림 조건의 하나라서, 시드와 프롬프트가 같아도 <strong>포즈를 바꾸거나 빼면 그림 전체가 달라집니다.</strong></li>
+</ul>
+
+<h3 id="pose-3d">3D 모델 → 포즈</h3>
+<p>3D 모델의 뼈(본)에서 관절 위치를 바로 계산하므로 빠르고 정확합니다. 모델을 여는 방법(지원 형식, 텍스처 폴더 고르기, 동작 FBX 함께 고르기)은 <a href="#extract-3d">3D 모델에서 추출</a>과 같습니다. 뼈대는 텍스처와 상관없으므로, 포즈만 만들 때는 텍스처가 빠져 회색으로 보여도 괜찮습니다.</p>
+<ol>
+  <li>프롬프트 추출 탭에서 [3D 모델]을 고르고 모델을 엽니다.</li>
+  <li><strong>자세를 고릅니다.</strong> 애니메이션 클립과 시간 슬라이더로 동작의 한 순간을 고르거나, T자·A자 기본 자세라면 [팔 내리기]를 켭니다.</li>
+  <li><strong>각도와 프레이밍</strong>을 정합니다: [정면] [왼쪽 3/4] [오른쪽 3/4] [옆] [뒤], [전신] [상반신]. 마우스 드래그로 돌리고 휠로 확대할 수도 있습니다.</li>
+  <li><strong>포즈 크기</strong>를 고릅니다: 세로 832×1216(기본) / 가로 1216×832 / 와이드 1344×768 / 정사각 1024×1024. <strong>만들 그림의 크기와 같게</strong> 고르세요(캐릭터·스프라이트는 세로, CG는 와이드). 화면 비율이 그 크기에 맞게 바뀌고, 전신이 잘리지 않게 다시 맞춰집니다.</li>
+  <li>[뼈대 보기]를 켜고 확인합니다. 점이 관절 위에 정확히 있는지, 정면인데 코·눈 점이 보이는지 봅니다. 정면인데 코·눈 점이 없으면 모델이 뒤를 보고 있는 것이니 [앞뒤 바꾸기]를 누르세요.</li>
+  <li>[포즈 저장]을 누르면 포즈 라이브러리에 저장되고, 알림의 [생성 탭으로]로 바로 쓸 수 있습니다. [이 포즈로 생성…]은 저장한 뒤 생성 탭으로 포즈를 보내고, 이 모델에서 추출한 프롬프트가 있으면 함께 보냅니다. 생성 탭에 쓰던 프롬프트가 있었다면 12초 동안 나오는 알림의 [되돌리기]로 되살릴 수 있습니다.</li>
+</ol>
+
+<h4 id="pose-3d-controls">자세 잡기 요령</h4>
+<table>
+  <thead><tr><th>도구</th><th>포즈를 만들 때의 쓰임</th></tr></thead>
+  <tbody>
+    <tr><td>애니메이션 클립 · 시간 슬라이더</td><td>가장 다양한 자세를 얻는 방법입니다. 모델에 동작이 들어 있거나, Mixamo 같은 곳의 동작 FBX를 모델과 함께 골랐을 때 나타납니다. 시간 슬라이더를 천천히 움직여 원하는 순간에서 멈추세요. 팔다리가 몸통과 겹치지 않고 잘 보이는 순간이 결과가 좋습니다.</td></tr>
+    <tr><td>[팔 내리기]</td><td>T자·A자 기본 자세의 팔을 내려 차렷 자세로 만듭니다. 스프라이트처럼 자연스럽게 서 있는 포즈가 필요할 때 씁니다.</td></tr>
+    <tr><td>각도 버튼</td><td>정면과 3/4가 가장 안정적입니다. 옆·뒤도 되지만 프롬프트에 <code>from side</code>, <code>from behind</code>를 함께 넣으면 더 확실합니다. 마우스로 위나 아래에서 크게 기울여 본 시점은 팔다리가 짧은 선으로 찍혀 결과가 어색해지기 쉽습니다.</td></tr>
+    <tr><td>[전신] [상반신]</td><td>화면 밖으로 나간 점은 포즈에서 빠집니다. [상반신]으로 만들면 다리 점이 없으므로 다리는 모델이 알아서 그리고, 프롬프트에는 <code>upper body</code>나 <code>cowboy shot</code>을 넣으세요. [얼굴]은 머리 주변 점 몇 개뿐이라 포즈용으로는 거의 쓸모가 없습니다.</td></tr>
+    <tr><td>[앞뒤 바꾸기]</td><td>정면 버튼을 눌렀는데 뒷모습이 보이면 누르세요. 그대로 저장하면 뒷모습 포즈가 됩니다.</td></tr>
+    <tr><td>배경색 · 밝기</td><td>뼈대에서 바로 계산할 때는 포즈에 영향이 없습니다(아래의 "렌더에서 감지"일 때만 렌더 그림이 쓰입니다).</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>몸통 점은 팔이나 옷에 가려져도 그려집니다(원래 OpenPose 방식과 같음). 반대로 화면 밖의 점은 빠집니다.</li>
+  <li>3D 포즈는 그 모델의 <strong>체형 비율도 함께</strong> 옮깁니다. 머리가 크고 팔다리가 짧은 SD(2~3등신) 캐릭터로 만든 포즈는 결과 그림도 그 비율을 따라가려 합니다(<a href="#pose-limits">한계</a>).</li>
+</ul>
+
+<h4 id="pose-3d-detect">뼈를 찾지 못하는 모델: 렌더에서 감지</h4>
+<p>앱은 뼈 이름으로 관절을 찾습니다. VRM(휴머노이드 정보), Mixamo(<code>mixamorig:LeftArm</code> 등), VRoid에서 내보낸 FBX(<code>J_Bip_L_UpperArm</code> 등), 언리얼식(<code>upperarm_l</code> 등), MMD(<code>左腕</code>, <code>左ひじ</code> 등) 이름을 압니다. 뼈가 없는 <code>.obj</code>나 뼈 이름이 특이한 모델은 관절을 찾지 못합니다.</p>
+<ul>
+  <li>이때는 안내 문구가 나오고 [포즈 저장]·[이 포즈로 생성…]이 <strong>"렌더에서 감지"</strong> 방식으로 동작합니다. 지금 화면을 흰 배경으로 찍은 뒤, 그 그림에서 이미지와 같은 방법으로 자세를 감지합니다.</li>
+  <li>감지는 사람처럼 보이는 그림일수록 정확하므로 [정면]·[전신]으로 찍고, 텍스처도 함께 골라 원래 모습이 보이게 하는 것이 좋습니다. 사람으로 보이지 않을 만큼 단순한 모델은 감지에 실패할 수 있습니다.</li>
+  <li>저장한 포즈의 뼈대는 생성 탭의 포즈 카드나 [포즈 고르기] 창의 뼈대 보기로 확인하세요.</li>
+  <li><strong>손가락</strong>: 뼈로 계산할 때는 손가락 뼈가 있는 모델(VRM, Mixamo 등)만 손 뼈대가 들어가고, 손가락 뼈가 없으면 손은 생략됩니다.</li>
+</ul>
+
+<h3 id="pose-image">이미지 → 포즈 감지</h3>
+<ol>
+  <li>프롬프트 추출 탭에서 [이미지]를 고르고 그림을 넣거나 [갤러리에서 고르기]로 고릅니다. 태그 추출도 평소처럼 함께 됩니다.</li>
+  <li>[이 그림에서 포즈 감지]를 누릅니다. 1장에 0.3~0.7초 걸리고, 처음 한 번은 감지 모델을 읽느라 몇 초 더 걸립니다.</li>
+  <li>[뼈대 겹쳐 보기]를 눌러 결과 뼈대를 원본 위에 겹쳐 보고, 점이 인물의 관절과 맞는지 확인합니다.</li>
+  <li>[생성 탭으로]를 누르면 생성 탭에 포즈가 들어갑니다.</li>
+</ol>
+<p>생성 탭의 [포즈 고르기] 창에 있는 [이미지에서 감지]로 그림 파일을 바로 올려 감지할 수도 있습니다.</p>
+<ul>
+  <li>감지에는 DWPose라는 자세 인식 모델을 쓰며, 엔진이 아니라 Studio가 이 Mac의 CPU로 처리합니다.</li>
+  <li>감지하면 <strong>바로 포즈 라이브러리에 저장</strong>됩니다(원본 그림의 축소본 미리보기 포함). 필요 없는 포즈는 [포즈 고르기] 창에서 삭제하세요.</li>
+  <li>포즈 맵은 원본 그림의 비율을 따르는 <strong>SDXL 생성 크기</strong>로 만들어집니다. 비율이 기본 크기와 같으면 그 크기(예: 1248×1824 → 세로 832×1216), 아니면 넓이가 약 1메가픽셀(1024×1024)을 넘지 않게 줄인 크기(8의 배수)입니다. 생성 탭에서는 크기가 이 크기로 자동 설정되므로, 비율이 특이하면 세로 832×1216 같은 기본 크기 버튼으로 바꾸세요(<a href="#pose-size">크기와 잘림</a>).</li>
+  <li><strong>여러 명</strong>이 있으면 화면에서 가장 크게 보이는 1명의 자세만 씁니다. 모두 뽑으려면 CLI의 <code>--all</code>을 쓰세요(<a href="#pose-cli">CLI</a>).</li>
+</ul>
+<table>
+  <thead><tr><th>잘 감지되는 그림</th><th>잘 안 되는 그림</th></tr></thead>
+  <tbody>
+    <tr><td>
+      <ul>
+        <li>전신이 다 보이는 그림. 실측에서 haru 스프라이트 같은 전신 그림은 정확했습니다</li>
+        <li>팔다리가 몸통과 겹치지 않는 자세</li>
+        <li>인물이 화면 높이의 절반 이상을 차지하는 그림</li>
+        <li>사진도 됩니다. 원하는 자세를 직접 취해 찍은 사진이 의외로 좋은 재료입니다. 포즈 맵에는 자세만 남고 얼굴·옷은 남지 않습니다</li>
+      </ul>
+    </td><td>
+      <ul>
+        <li>얼굴이 화면을 채우는 상반신 클로즈업: 어깨·팔 위치가 부정확할 수 있습니다</li>
+        <li>아주 작게 그려진 인물, 여러 명이 겹친 장면</li>
+        <li>사람이 아닌 캐릭터(동물, 로봇), 극단적인 SD 캐릭터</li>
+        <li>이미 그려진 OpenPose 뼈대 그림: 사람이 없어서 감지에 실패합니다. [뼈대 그림 올리기]로 넣으세요(<a href="#pose-library">포즈 라이브러리</a>)</li>
+      </ul>
+    </td></tr>
+  </tbody>
+</table>
+
+<h3 id="pose-generate">생성 탭에서 쓰기</h3>
+<p>생성 탭의 LoRA 아래에 있는 <strong>포즈 (ControlNet)</strong> 묶음에서 포즈를 붙이고 조절합니다.</p>
+<table>
+  <thead><tr><th>항목</th><th>하는 일</th></tr></thead>
+  <tbody>
+    <tr><td>포즈 카드</td><td>붙인 포즈의 뼈대 썸네일, 이름, 크기를 보여 줍니다. 마우스를 올리면 원본(그림 또는 3D 렌더) 미리보기가 나오고, [원본 보기]를 누르면 썸네일이 원본으로 바뀝니다([뼈대 보기]로 되돌림).</td></tr>
+    <tr><td>[포즈 고르기]</td><td>포즈 라이브러리 창을 엽니다. 최신순으로 보이고, 원본/뼈대 보기를 전환하거나 포즈를 삭제할 수 있습니다. 창 안의 [이미지에서 감지]로 그림에서 바로 만들고, [3D에서 만들기]로 프롬프트 추출 탭으로 갑니다.</td></tr>
+    <tr><td>[빼기]</td><td>포즈를 떼고 원래대로 생성합니다.</td></tr>
+    <tr><td><strong>강도</strong></td><td>0.1~2.0. 뼈대를 얼마나 강하게 따를지(<a href="#pose-strength">강도와 적용 구간</a>).</td></tr>
+    <tr><td><strong>적용 구간(끝)</strong></td><td>0.1~1.0. 1차 생성의 처음부터 어디까지 포즈를 적용할지.</td></tr>
+    <tr><td><strong>ControlNet</strong></td><td>자세를 읽는 모델. 설치된 목록에서 고르며, 바꾸면 강도 슬라이더가 그 모델의 권장값(NoobAI OpenPose 1.0, xinsir 1.2)으로 옮겨집니다(<a href="#pose-controlnet">두 종류의 차이</a>).</td></tr>
+  </tbody>
+</table>
+<p>예상 소요 시간 표시에도 ControlNet 사용분이 반영됩니다.</p>
+
+<h4 id="pose-size">크기와 잘림</h4>
+<ul>
+  <li>포즈를 고르면 생성 <strong>크기가 포즈 크기로 자동 설정</strong>되고 안내가 나옵니다. 세로 832×1216처럼 기본 크기와 같으면 그 버튼이, 아니면 사용자 지정 W×H가 선택됩니다.</li>
+  <li>그 뒤에 크기를 바꾸면 <strong>"포즈가 가운데 기준으로 잘립니다"</strong> 경고가 나옵니다. 포즈 맵을 새 크기에 꽉 차게 늘리거나 줄인 다음, 넘치는 부분을 가운데 기준으로 잘라 쓰기 때문입니다. 예를 들어 세로 포즈를 와이드(1344×768)로 쓰면 위아래가 크게 잘려 머리나 발이 사라질 수 있습니다. 경고 옆의 [포즈 크기로 맞추기]를 누르면 생성 크기가 다시 포즈 크기로 돌아갑니다.</li>
+  <li>가장 좋은 방법은 <strong>처음부터 쓸 크기로 포즈를 만드는 것</strong>입니다. 3D에서는 [포즈 크기]를 고르면 되고, 이미지에서 감지한 포즈는 원본 비율을 따르므로 원본을 미리 원하는 비율로 잘라 두면 좋습니다.</li>
+</ul>
+
+<h4 id="pose-character">캐릭터 탭: 시안 · 스프라이트 · CG</h4>
+<p>캐릭터 탭의 생성하기 패널에도 같은 포즈 선택이 작게 들어 있습니다(포즈 카드 + 강도). 고른 포즈는 시안·스프라이트·CG에 공통으로 적용됩니다.</p>
+<ul>
+  <li><strong>시안</strong>: 같은 포즈로 여러 장을 뽑으면 자세는 같고 얼굴·옷의 해석만 달라져 비교하고 고르기 쉽습니다.
+    <ul>
+      <li>캐릭터의 <em>시안 포즈</em> 칸(기본 <code>upper body, looking at viewer, …</code>)은 시안을 만들 때 항상 들어갑니다. 전신 포즈를 쓸 때는 그 칸의 <code>upper body</code>를 <code>full body</code>로 바꾸세요. 그대로 두면 구도 태그와 포즈가 싸워 결과가 흔들릴 수 있습니다.</li>
+    </ul>
+  </li>
+  <li><strong>스프라이트</strong>: "기본 포즈에만 적용" 안내대로 전신 기본 포즈를 그릴 때만 쓰입니다. 표정은 그 위에서 얼굴만 다시 그리므로 모든 표정이 같은 자세가 됩니다(<a href="#sprite">표정 차분과 투명 스프라이트</a>).
+    <ul>
+      <li>배경 제거와 손이 깔끔하게 나오도록 정면 전신, 팔이 몸에서 크게 벗어나지 않는 자세를 권장합니다.</li>
+      <li>캐릭터의 <em>스프라이트 포즈</em> 칸에 있는 <code>arms at sides</code> 같은 태그가 포즈와 모순되면 그 칸을 고치세요. 그 칸은 스프라이트를 만들 때 항상 들어갑니다.</li>
+      <li>포즈를 붙여 만든 스프라이트에 나중에 표정을 추가할 때는 <strong>같은 포즈·강도·시드</strong>를 써야 기본 포즈가 똑같이 나와 기존 표정과 겹칩니다(<a href="#sprite-seed">시드 고정이 중요한 이유</a>).</li>
+    </ul>
+  </li>
+  <li><strong>CG</strong>: 포즈가 가장 쓸모 있는 곳입니다. 장면 프롬프트로 장소·상황을 정하고, 포즈로 동작을 정하세요. CG의 기본 크기는 와이드(1344×768)이므로 3D 포즈도 [포즈 크기] 와이드로 만드세요.</li>
+</ul>
+
+<h4 id="pose-history">다시 만들기와 기록</h4>
+<ul>
+  <li>작업 목록, 갤러리 정보 패널, 큰 이미지 보기에 사용한 포즈의 썸네일과 이름이 표시됩니다.</li>
+  <li>[같은 설정으로 다시]와 [생성 탭에서 편집]은 포즈도 그대로 가져옵니다. 그 사이 포즈 파일을 삭제했다면 안내가 나오고 포즈 없이 진행됩니다.</li>
+</ul>
+
+<h3 id="pose-strength">강도와 적용 구간</h3>
+<ul>
+  <li><strong>강도</strong>는 뼈대를 얼마나 세게 따를지입니다. 0이면 포즈가 없는 것과 같고, 높을수록 팔다리를 뼈대 위치에 강하게 맞춥니다.</li>
+  <li><strong>적용 구간(끝)</strong>은 1차 생성의 <strong>처음부터 몇 %까지</strong> 포즈를 적용할지입니다. 1.0이면 끝까지, 0.8이면 앞의 80%만 적용합니다. 그림의 큰 형태(자세·구도)는 초반에 정해지고 후반에는 세부를 그리므로, 끝을 낮추면 세부는 자유로워지지만 든 팔처럼 큰 동작이 흐트러질 수 있습니다.</li>
+</ul>
+<table>
+  <thead><tr><th>ControlNet</th><th>강도</th><th>적용 구간(끝)</th></tr></thead>
+  <tbody>
+    <tr><td>NoobAI OpenPose (WAI·NoobAI 권장) — 기본</td><td><strong>1.0</strong></td><td><strong>1.0</strong></td></tr>
+    <tr><td>xinsir OpenPose (SDXL 범용)</td><td><strong>1.2 이상</strong></td><td>1.0</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>증상</th><th>이렇게 조절</th></tr></thead>
+  <tbody>
+    <tr><td>자세를 안 따라옴. 특히 든 팔, 뻗은 다리처럼 큰 동작을 무시함</td><td>적용 구간(끝)이 1.0인지 확인 → 강도를 0.1~0.2씩 올림 → ControlNet이 지금 프리셋에 맞는지 확인. 실측에서는 강도·구간을 0.8로 낮췄을 때 든 팔이 무시되었습니다</td></tr>
+    <tr><td>그림이 딱딱함, 몸이 뼈대처럼 가늘거나 뻣뻣함, 선이 뭉개짐, 이상한 무늬가 생김</td><td>적용 구간(끝)을 0.8쯤으로 → 그래도 그러면 강도를 0.8쯤으로 내림</td></tr>
+    <tr><td>옷·구도가 프롬프트와 다르게 나옴</td><td>강도를 조금 내리고, 프롬프트에서 자세와 모순되는 태그를 뺌(<a href="#pose-prompt">프롬프트 팁</a>)</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>비교할 때는 시드를 고정하고 빠른 미리보기로 한 값씩 바꿔 보세요. 같은 시드여야 포즈 설정의 차이만 볼 수 있습니다.</li>
+  <li>1.5를 넘는 강도는 그림이 딱딱해지거나 뭉개지기 쉬워 권하지 않습니다. 그 정도로 올려야 따라온다면 ControlNet이나 포즈 맵 자체를 먼저 의심하세요.</li>
+  <li>처음 선택되는 값은 <strong>모델·LoRA</strong> 탭 › 전역 설정 › <strong>포즈 (ControlNet)</strong> 묶음의 기본 ControlNet, 기본 강도, 기본 적용 구간에서 바꿉니다.</li>
+</ul>
+
+<h3 id="pose-controlnet">ControlNet 두 종류</h3>
+<p>SDXL용 OpenPose ControlNet이 두 개 설치되어 있습니다. 둘 다 약 2.5GB입니다.</p>
+<table>
+  <thead><tr><th>항목</th><th>NoobAI OpenPose (WAI·NoobAI 권장)</th><th>xinsir OpenPose (SDXL 범용)</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">파일</th><td><code>noob_openpose.safetensors</code></td><td><code>controlnet-openpose-sdxl-1.0.safetensors</code></td></tr>
+    <tr><th scope="row">위치</th><td><code>/Volumes/T7/VN-Pipeline/models/controlnet/</code></td><td><code>/Volumes/T7/ComfyUI/Installs/ComfyUI/ComfyUI/models/controlnet/</code> (엔진 폴더)</td></tr>
+    <tr><th scope="row">만든 곳</th><td>Laxhar(NoobAI-XL 개발팀). NoobAI·Illustrious 계열 전용으로 학습</td><td>xinsir. SDXL 범용</td></tr>
+    <tr><th scope="row">뼈대 선</th><td>얇은 표준 선</td><td>굵은 선</td></tr>
+    <tr><th scope="row">권장 강도 / 구간</th><td>1.0 / 1.0</td><td>1.2 이상 / 1.0</td></tr>
+    <tr><th scope="row">어울리는 프리셋</th><td><code>wai</code>, <code>noob</code>, <code>noob-hq</code>, <code>noob-eps</code>. 그림체가 잘 맞습니다</td><td>그 밖의 SDXL 모델, 또는 상업 이용 조건이 중요한 경우</td></tr>
+    <tr><th scope="row">라이선스</th><td>저장소에 표기 없음 → NoobAI와 같은 비상업 조건으로 보는 것이 안전(<a href="#pose-license">아래</a>)</td><td>Apache-2.0</td></tr>
+  </tbody>
+</table>
+<p><strong>선 굵기는 앱이 알아서 맞춥니다.</strong> 두 ControlNet은 학습할 때 본 뼈대 선의 굵기가 달라서, 맞지 않는 굵기의 맵을 주면 큰 동작을 놓칩니다. 그래서 포즈를 저장할 때 얇은 선 맵과 굵은 선 맵을 함께 만들어 두고, 생성할 때 고른 ControlNet에 맞는 쪽을 씁니다. 앱은 <strong>파일 이름</strong>으로 어느 쪽인지 판단하므로 두 파일의 이름은 바꾸지 마세요. 이름이 다른 ControlNet 파일은 얇은 선, 강도 1.0으로 취급합니다.</p>
+
+<h4 id="pose-test">기본값을 정한 실측 (A/B)</h4>
+<p>WAI v17 프리셋, 빠른 미리보기(832×1216, 28스텝), 같은 시드와 같은 프롬프트(<code>1girl, solo, black hair, ponytail, red eyes, maid, maid headdress, apron, full body, indoors, cafe</code> — 팔 동작 태그는 없음)로 비교했습니다. 포즈는 "한 팔 번쩍 + 반대 손은 허리 + 다리 벌림" 자세의 그림에서 감지했습니다.</p>
+<table>
+  <thead><tr><th>조건</th><th>결과</th></tr></thead>
+  <tbody>
+    <tr><td>ControlNet 없음</td><td>자세와 무관한 그림</td></tr>
+    <tr><td>xinsir, 굵은 선, 강도/구간 0.8/0.8과 1.0/1.0</td><td>다리와 허리 손은 따라갔지만 <strong>든 팔은 무시</strong></td></tr>
+    <tr><td>xinsir, 굵은 선, 1.2/1.0</td><td>든 팔까지 따라감. 프롬프트에 동작이 없어서 쟁반을 높이 든 모습으로 해석</td></tr>
+    <tr><td>NoobAI OpenPose, 굵은 선, 0.8/0.8</td><td>든 팔 무시</td></tr>
+    <tr><td><strong>NoobAI OpenPose, 얇은 선, 1.0/1.0</strong></td><td><strong>든 팔(손 흔들기)·허리 손·다리 모두 정확.</strong> 긴 메이드 드레스와 구도도 프롬프트대로 → 기본값</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>속도: ControlNet을 쓰면 1차 생성이 1스텝당 3.4초 → 4.9초(약 40% 느림)가 되었고, 빠른 미리보기 1장은 약 100초에서 약 200초로 늘었습니다. 하이레즈·얼굴·손 보정은 포즈 없이 돌기 때문에 늘어나는 것은 1차 생성 부분입니다.</li>
+  <li>ComfyUI의 자세 감지 노드(DWPreprocessor)는 이 Mac에서 뼈대를 엉뚱한 위치·크기로 그려서 쓰지 않습니다. 그래서 이미지 감지는 Studio가 직접 합니다.</li>
+</ul>
+
+<h4 id="pose-license">라이선스</h4>
+<div class="callout warn">
+  <p><strong>NoobAI OpenPose(<code>noob_openpose</code>)는 상업 이용이 제한될 수 있습니다.</strong> 이 파일의 원본인 Hugging Face <code>Laxhar/noob_openpose</code> 저장소에는 모델 카드나 라이선스 표기가 따로 없습니다(2026년 11월 확인). NoobAI-XL을 만든 팀의 NoobAI 계열 모델이므로 <a href="#license">NoobAI-XL과 같은 비상업 조건</a>이 적용된다고 보고, 판매할 게임의 에셋에는 쓰지 않는 것이 안전합니다. 쓰기 전에 저장소에서 최신 표기를 직접 확인하세요.</p>
+</div>
+<ul>
+  <li><strong>xinsir</strong>(<code>xinsir/controlnet-openpose-sdxl-1.0</code>)는 Apache-2.0이라 ControlNet 자체는 상업적 프로젝트에도 쓸 수 있습니다. 판매용 에셋에 포즈를 써야 한다면 xinsir를 고르고 강도를 1.2 이상으로 두세요.</li>
+  <li>어느 ControlNet을 쓰든 결과 그림에는 <strong>체크포인트·LoRA의 라이선스가 그대로</strong> 적용됩니다. 여러 모델을 함께 쓰면 가장 엄격한 조건을 따른다고 생각하세요.</li>
+  <li><strong>포즈의 원본</strong>도 확인하세요. 3D 모델은 이용 약관(AI 생성의 참고로 써도 되는지)을, 참고 그림은 저작권을 확인합니다(<a href="#extract-license">이용 약관과 저작권</a>). 포즈 맵에는 자세만 남지만, 특정 작품의 특징적인 구도를 그대로 따라 그리는 것은 피하세요.</li>
+  <li>이 문서는 법률 자문이 아니며 일반적인 주의사항입니다.</li>
+</ul>
+
+<h4 id="pose-install">ControlNet 파일 확인과 다시 받기</h4>
+<p>생성할 때 ControlNet 파일을 찾을 수 없다는 오류가 나거나, 생성 탭의 ControlNet 목록이 비어 있으면 아래 위치에 파일이 있는지 확인하세요. 둘 다 약 2.5GB이며, 이보다 훨씬 작으면 다운로드가 중간에 끊긴 것입니다.</p>
+<table>
+  <thead><tr><th>앱에서 쓰는 이름 (넣을 곳)</th><th>Hugging Face 저장소</th><th>받을 파일</th></tr></thead>
+  <tbody>
+    <tr><td><code>noob_openpose.safetensors</code><br>(<code>/Volumes/T7/VN-Pipeline/models/controlnet/</code>)</td><td><code>Laxhar/noob_openpose</code></td><td><code>openpose_pre.safetensors</code></td></tr>
+    <tr><td><code>controlnet-openpose-sdxl-1.0.safetensors</code><br>(<code>/Volumes/T7/ComfyUI/Installs/ComfyUI/ComfyUI/models/controlnet/</code>)</td><td><code>xinsir/controlnet-openpose-sdxl-1.0</code></td><td><code>diffusion_pytorch_model.safetensors</code></td></tr>
+  </tbody>
+</table>
+<ol>
+  <li>Hugging Face의 저장소에서 <strong>Files and versions</strong> 탭을 열고 위 표의 파일을 브라우저로 받습니다.</li>
+  <li>받은 파일의 <strong>이름을 왼쪽 열의 이름으로 바꿔</strong> 그 폴더에 넣습니다. 앱이 파일 이름으로 선 굵기와 권장 강도를 정하므로 이름이 중요합니다.</li>
+  <li>모델·LoRA 탭에서 [목록 새로고침]을 누르거나 화면을 새로고침(<kbd>⌘</kbd>+<kbd>R</kbd>)하면 ControlNet 목록에 나타납니다.</li>
+</ol>
+<ul>
+  <li>두 파일 모두 <code>VN-Pipeline/models/controlnet/</code>에 두어도 됩니다. 모델 폴더 세 곳을 함께 인식합니다(<a href="#files-models">모델 폴더</a>).</li>
+  <li>엔진을 새로 설치했다면 엔진이 <code>VN-Pipeline/models/controlnet/</code>을 보도록 하는 설정이 빠졌을 수 있습니다. 그럴 때는 파일을 엔진 폴더(<code>ComfyUI/models/controlnet/</code>)에 두는 것이 가장 확실합니다.</li>
+</ul>
+
+<h3 id="pose-prompt">프롬프트 팁</h3>
+<ul>
+  <li><strong>자세와 모순되는 태그를 빼세요.</strong> 포즈는 서 있는데 <code>sitting</code>, 팔을 들었는데 <code>arms at sides</code>, <code>hands in pockets</code>, <code>arms behind back</code>이 있으면 포즈와 프롬프트가 싸워 팔다리가 꼬이거나 포즈가 무시됩니다. 캐릭터 탭의 시안·스프라이트에는 캐릭터의 <em>시안 포즈</em>·<em>스프라이트 포즈</em> 칸이 함께 들어가므로 그 칸도 확인하세요.</li>
+  <li><strong>구도 태그를 포즈의 프레이밍에 맞추세요.</strong> 전신 포즈면 <code>full body</code>, 상반신 포즈면 <code>upper body</code>나 <code>cowboy shot</code>. 뒷모습 포즈면 <code>from behind</code>, 옆모습이면 <code>from side</code>를 넣으면 더 확실합니다.</li>
+  <li><strong>손이 무엇을 하는지 적어 주세요.</strong> 뼈대는 팔의 위치만 알려 줄 뿐 동작의 의미는 모릅니다. 실측에서 같은 "든 팔"이 한 번은 손 흔들기로, 한 번은 쟁반을 든 모습으로 그려졌습니다. 원하는 동작을 <code>waving</code>, <code>arm up</code>, <code>hand on own hip</code>, <code>holding tray</code>처럼 태그로 적으면 해석이 안정됩니다.</li>
+  <li><strong>표정은 프롬프트로</strong> 정합니다(<code>smile</code>, <code>open mouth</code> 등). 포즈는 표정을 정하지 않습니다.</li>
+  <li><strong>3D 모델에서 추출한 프롬프트</strong>를 함께 보냈다면, 3D 원본은 포즈·구도·배경 태그가 기본으로 꺼져 있으므로(<a href="#extract-groups">태그 그룹과 기본 제외</a>) 구도와 장소 태그(<code>full body, indoors, cafe</code> 등)를 직접 보태세요.</li>
+  <li>포즈 태그(<code>standing</code>, <code>waving</code> 등)를 함께 써도 괜찮지만, 포즈와 같은 내용이어야 합니다.</li>
+</ul>
+
+<h3 id="pose-recipes">실전 레시피</h3>
+<h4>VRoid 모델의 동작으로 이벤트 CG 만들기</h4>
+<ol>
+  <li>내가 만든 VRoid 모델(<code>.vrm</code>)을 [3D 모델]로 열고, 동작 FBX가 있으면 함께 골라 원하는 순간을 찾습니다. 없으면 [팔 내리기]와 각도만으로도 됩니다.</li>
+  <li>[포즈 크기]를 와이드 1344×768로, 프레이밍을 [전신]이나 [상반신]으로 맞추고 [뼈대 보기]로 확인합니다.</li>
+  <li>[포즈 저장] 뒤 캐릭터 탭에서 그 캐릭터를 열고 생성하기 패널에서 포즈를 고른 뒤 [CG 생성]에 장면 프롬프트(<code>park, sunset, cherry blossoms, waving, smile</code> 등)를 적습니다.</li>
+  <li>빠른 미리보기로 3~4장 뽑아 고르고 [고품질로 다시]로 완성합니다.</li>
+</ol>
+<h4>여러 캐릭터의 스탠딩 자세 맞추기</h4>
+<p>정면 전신 차렷 포즈를 하나 만들어 두고 모든 캐릭터의 스프라이트에 같은 포즈를 쓰면, 화면에 나란히 세웠을 때 자세와 발 위치가 맞는 스탠딩 세트가 됩니다. 키 차이는 포즈가 정하므로 키가 다른 캐릭터는 포즈를 따로 만들거나 강도를 조금 낮추세요.</p>
+<h4>직접 찍은 사진으로 자세 정하기</h4>
+<p>원하는 자세를 직접 취해 휴대폰으로 전신 사진을 찍고 [이미지]로 넣어 [이 그림에서 포즈 감지]를 누릅니다. 사진의 얼굴·옷은 포즈에 남지 않으므로, 자세만 빌려 캐릭터를 그릴 수 있습니다. 세로 사진이면 생성 크기를 세로 832×1216으로 바꾸세요.</p>
+
+<h3 id="pose-library">포즈 라이브러리 (저장되는 파일)</h3>
+<p>저장하거나 감지한 포즈는 엔진의 입력 폴더인 <code>/Volumes/T7/VN-Pipeline/input/poses/</code>에 쌓이고, [포즈 고르기] 창에 최신순으로 나타납니다. 포즈 하나는 이름이 같은 파일 여러 개로 이루어집니다.</p>
+<table>
+  <thead><tr><th>파일</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr><td><code>pose_20261109_143015_a1b2.png</code></td><td>얇은 선 포즈 맵 (만든 날짜_시각_무작위 4자리)</td></tr>
+    <tr><td><code>pose_20261109_143015_a1b2.thick.png</code></td><td>굵은 선 포즈 맵 (xinsir용)</td></tr>
+    <tr><td><code>pose_20261109_143015_a1b2.json</code></td><td>정보: 원본 종류(3D/이미지), 원본 이름, 각도·프레이밍·클립, 크기, 손 포함 여부, 관절 좌표</td></tr>
+    <tr><td><code>pose_20261109_143015_a1b2.src.jpg</code></td><td>원본 그림이나 3D 렌더의 축소본 미리보기 (없을 수도 있음)</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li><strong>삭제</strong>: [포즈 고르기] 창에서 지우면 <code>user/trash/poses/</code>로 옮겨집니다. 되살리려면 같은 이름의 파일들을 모두 <code>input/poses/</code>로 다시 옮기고 화면을 새로고침하세요.</li>
+  <li><strong>다른 곳에서 만든 뼈대</strong>: [포즈 고르기] 창의 [뼈대 그림 올리기]로 다른 프로그램에서 만든 OpenPose 뼈대 그림(검은 배경)을 그대로 라이브러리에 넣을 수 있습니다. 원본 종류가 '업로드'로 표시되고, 굵은 선 맵은 따로 만들지 않아 두 ControlNet 모두 올린 그림을 그대로 씁니다.</li>
+  <li>파일 이름을 바꾸지 마세요. 작업 기록과 갤러리 정보는 포즈를 이름으로 기억하고, 같은 이름의 맵·정보 파일이 함께 있어야 합니다.</li>
+  <li><code>.src.jpg</code>에는 원본 그림의 축소본이 들어 있습니다. 이 Mac 안에만 있지만, 폴더를 다른 사람과 공유할 때는 이 점을 기억하세요.</li>
+  <li>자주 쓰는 포즈가 쌓였다면 <code>input/poses/</code>도 백업해 두면 좋습니다. 용량이 작습니다.</li>
+</ul>
+
+<h3 id="pose-limits">한계</h3>
+<ul>
+  <li><strong>손가락</strong>은 손 뼈대가 있어야 방향을 알려 줄 수 있습니다. 3D는 손가락 뼈가 있는 모델, 이미지는 손이 잘 보이는 그림이어야 하며, 손 뼈대가 있어도 손가락 개수·모양까지 보장하지는 않습니다. 손 보정은 계속 켜 두세요(<a href="#ts-pose-hands">손이 이상해요</a>).</li>
+  <li><strong>체형 비율도 따라갑니다.</strong> 머리가 크고 팔다리가 짧은 SD 캐릭터 3D로 만든 포즈를 쓰면 결과 그림도 그 비율로 나오거나 몸이 어색해집니다. 보통 비율의 모델로 포즈를 만드세요. 일부러 SD 그림을 원할 때는 <code>chibi</code>를 프롬프트에 넣으세요.</li>
+  <li><strong>느려집니다.</strong> 1차 생성이 약 40% 느려지고(빠른 미리보기 1장 약 100초 → 약 200초), ControlNet 파일(약 2.5GB)만큼 엔진의 메모리 사용도 늘어납니다.</li>
+  <li><strong>평면 정보입니다.</strong> 포즈 맵은 2D 점과 선이라, 팔이 몸 앞에 있는지 뒤에 있는지, 다리가 어느 쪽으로 교차하는지 같은 앞뒤 관계는 잘 전달되지 않습니다. 팔짱·다리 꼬기처럼 겹치는 자세는 결과가 흔들립니다.</li>
+  <li><strong>한 사람만</strong> 다루는 것을 기본으로 합니다. 여러 명의 자세를 한 그림에 정확히 넣는 일은 어렵습니다.</li>
+  <li>배경 탭에는 쓰지 않고, SDXL 프리셋에서만 동작합니다(설치된 프리셋은 모두 SDXL).</li>
+  <li>체형·옷 주름·소품 모양은 포즈가 정하지 않습니다. 이런 부분은 프롬프트와 시드로 고르세요.</li>
+</ul>
+
+<h3 id="pose-cli">CLI</h3>
+<p>터미널에서도 포즈를 만들고 붙여 생성할 수 있습니다. 포즈 감지와 목록 보기는 엔진 없이 되고, 생성은 엔진이 켜져 있어야 합니다.</p>
+<pre><code>cd /Volumes/T7/VN-Pipeline
+python3 vn.py pose detect ~/Desktop/reference.png --size 832x1216
+python3 vn.py pose list
+python3 vn.py prompt "1girl, solo, maid, waving, full body, indoors, cafe" --pose poses/pose_20261109_143015_a1b2.png
+python3 vn.py cg haru "park, sunset, waving, smile" --pose poses/pose_20261109_143015_a1b2.png --pose-strength 0.8 --pose-end 0.8</code></pre>
+<table>
+  <thead><tr><th>명령 / 옵션</th><th>뜻</th></tr></thead>
+  <tbody>
+    <tr><td><code>pose detect 이미지</code></td><td>그림에서 자세를 감지해 <code>input/poses/</code>에 저장하고 포즈 이름을 출력합니다</td></tr>
+    <tr><td><code>--size 832x1216</code></td><td>포즈 맵 크기. 생략하면 원본 비율의 SDXL 생성 크기(비율이 기본 크기와 같으면 그 크기, 예: 1248×1824 → 832×1216. 아니면 약 1메가픽셀 이하, 8의 배수). 비율이 다르면 가운데 기준으로 잘라 맞춥니다</td></tr>
+    <tr><td><code>--all</code></td><td>가장 큰 1명이 아니라 감지된 모든 사람</td></tr>
+    <tr><td><code>--no-hands</code></td><td>손 뼈대를 넣지 않음</td></tr>
+    <tr><td><code>pose list</code></td><td>저장된 포즈 목록</td></tr>
+    <tr><td><code>--pose poses/파일.png</code></td><td><code>prompt</code>, <code>concept</code>, <code>cg</code>, <code>sprite</code>에 포즈를 붙입니다</td></tr>
+    <tr><td><code>--pose-strength</code></td><td>강도 (0.1~2.0). 생략하면 전역 설정의 기본 강도</td></tr>
+    <tr><td><code>--pose-end</code></td><td>적용 구간 끝 (0.1~1.0). 생략하면 전역 설정의 기본 적용 구간</td></tr>
+    <tr><td><code>--pose-model 파일</code></td><td>ControlNet 파일 이름. 생략하면 전역 설정의 기본 ControlNet</td></tr>
+  </tbody>
+</table>
+<p>감지에 필요한 부품(onnxruntime·OpenCV·numpy)은 엔진 Python에만 들어 있습니다. <code>python3</code>로 실행했을 때 이런 부품이 없다는 오류가 나오면 엔진 Python으로 실행하세요.</p>
+<pre><code>/Volumes/T7/ComfyUI/Installs/ComfyUI/standalone-env/bin/python vn.py pose detect ~/Desktop/reference.png</code></pre>
+</section>

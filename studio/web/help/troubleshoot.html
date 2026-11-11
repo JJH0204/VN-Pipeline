@@ -1,0 +1,220 @@
+<section id="troubleshoot">
+<h2>문제 해결</h2>
+<p>대부분의 문제는 로그에 원인이 남습니다. 로그 파일은 두 개입니다.</p>
+<ul>
+  <li>엔진(ComfyUI) 로그: <code>/Volumes/T7/VN-Pipeline/user/server.log</code> (상단 바 ⋯ 메뉴 → [엔진 로그 보기]나 작업 탭의 [엔진 로그]로 보는 내용과 같습니다)</li>
+  <li>Studio 서버 로그: <code>/Volumes/T7/VN-Pipeline/user/studio.log</code></li>
+</ul>
+
+<h3 id="ts-engine">엔진이 시작되지 않아요</h3>
+<ol>
+  <li><strong>T7이 연결되어 있는지</strong> 확인합니다. Finder 사이드바에 T7이 보여야 합니다.</li>
+  <li>첫 시작은 20~60초 걸립니다. Mac을 재부팅한 직후에는 더 걸릴 수 있으니 1~2분 기다려 봅니다.</li>
+  <li>엔진 로그 끝부분을 확인합니다.
+    <ul>
+      <li><code>Address already in use</code> 또는 <code>port 8188</code> 관련 오류: 다른 프로그램(다른 ComfyUI 등)이 8188 포트를 쓰고 있습니다. 그 프로그램을 끄세요. 터미널에서 <code>lsof -iTCP:8188 -sTCP:LISTEN</code>으로 어떤 프로그램인지 볼 수 있습니다.</li>
+      <li><code>ModuleNotFoundError</code>: 엔진의 Python 환경이 손상된 경우입니다. 엔진 환경에는 직접 패키지를 설치하지 말고, 엔진(ComfyUI)을 다시 설치하는 쪽을 검토하세요.</li>
+      <li><code>FaceDetailer</code>, <code>UltralyticsDetectorProvider</code> 같은 노드 이름과 함께 "존재하지 않음(does not exist)"이 보이면: 얼굴·손 보정에 쓰는 확장(Impact Pack)이 빠진 것입니다. 얼굴·손 보정을 끄면 일반 생성은 되지만, 스프라이트는 이 확장이 있어야 만들 수 있습니다.</li>
+    </ul>
+  </li>
+  <li>상단 바의 [재시작]을 눌러 봅니다. 그래도 안 되면 <code>scripts/stop_studio.sh --all</code>로 모두 끄고 앱을 다시 실행합니다.</li>
+</ol>
+
+<h3 id="ts-app">VN Studio 앱이 열리지 않아요</h3>
+<ul>
+  <li><strong>아무 반응이 없을 때</strong>: 서버가 준비되는 데 최대 20초쯤 걸립니다. 그래도 안 열리면 <code>user/studio.log</code>를 보거나, 터미널에서 <code>/Volumes/T7/VN-Pipeline/studio.sh --open</code>을 실행해 오류 메시지를 확인하세요.</li>
+  <li><strong>"VN Studio를 실행할 수 없습니다" 경고</strong>: T7이 연결되어 있지 않거나 폴더 위치가 바뀐 경우입니다.</li>
+  <li><strong>포트 8190을 다른 프로그램이 사용 중</strong>이라는 메시지: 그 프로그램을 끄거나 <code>scripts/stop_studio.sh</code>를 실행한 뒤 다시 엽니다.</li>
+  <li><strong>창을 실수로 닫았을 때</strong>: 앱을 다시 더블클릭하거나 브라우저에서 <code>http://127.0.0.1:8190</code>을 엽니다. 서버는 계속 실행 중입니다.</li>
+  <li><strong>앱 아이콘이나 앱 자체가 망가졌을 때</strong>: 터미널에서 <code>/Volumes/T7/VN-Pipeline/scripts/make_app.sh</code>를 실행하면 다시 만들어집니다.</li>
+</ul>
+
+<h3 id="ts-slow">너무 느리거나 메모리가 부족해요</h3>
+<ul>
+  <li>정상 속도는 1차 생성(832×1216, 28스텝) 약 95초, 기본 품질 1장 4~5분입니다. 이보다 훨씬 느리다면 대개 <strong>메모리 부족</strong>입니다.</li>
+  <li>활성 상태 보기 → 메모리 탭의 "메모리 압력"이 노랑·빨강이면, Chrome 탭·게임·영상 편집 프로그램·다른 AI 앱을 닫으세요. 이 Mac의 24GB 중 엔진이 10GB 안팎을 씁니다.</li>
+  <li>프리셋(체크포인트)을 자주 바꾸면 매번 7GB를 다시 읽습니다. 같은 프리셋 작업끼리 모아서 돌리세요.</li>
+  <li>하이레즈 배율 2.0, 2048px에 가까운 사용자 지정 크기는 무겁습니다. 기본값(1.5, 832×1216)으로 돌려 보세요.</li>
+  <li>엔진을 오래 켜 두면 점점 느려질 수 있습니다. 상단 바의 [재시작]으로 메모리를 비우세요.</li>
+  <li>엔진 로그에 <code>MPS backend out of memory</code>가 보이면: 엔진 재시작 → 다른 앱 종료 → 하이레즈 배율 낮추기 순으로 시도합니다.</li>
+  <li>T7을 USB 허브 대신 Mac 본체의 USB-C(썬더볼트) 포트에 직접 연결하면 모델 읽는 시간이 줄어듭니다.</li>
+  <li>엔진은 한 번에 작업 하나만 처리합니다. 작업 탭에서 앞에 쌓인 작업이 있는지 확인하세요.</li>
+</ul>
+
+<h3 id="ts-hands">손가락·눈이 깨져요</h3>
+<ul>
+  <li><strong>손</strong>: 손 보정을 켜고 → 손 보정 강도를 0.45~0.5로 올리고 → <code>detailed_hands_unhinged</code> LoRA를 0.5~0.7로 추가하고 → <code>arms at sides</code>, <code>arms behind back</code>처럼 손이 단순한 포즈를 씁니다. 그래도 안 되면 시드를 바꾸는 것이 가장 빠릅니다. 빠른 미리보기로 여러 장 뽑아 손이 멀쩡한 시드를 고르세요.</li>
+  <li><strong>눈</strong>: 빠른 미리보기 결과의 눈이 거친 것은 정상입니다. 하이레즈와 얼굴 보정을 켜면 대부분 정리됩니다. 와이드 CG처럼 얼굴이 작을수록 얼굴 보정이 중요하며, 얼굴 보정 강도를 0.4~0.45로 올려 볼 수 있습니다.</li>
+  <li><strong>팔다리가 늘어나거나 몸이 두 개</strong>: 사용자 지정 크기가 너무 크거나(약 120만 화소 초과), 하이레즈 강도가 0.5를 넘는 경우가 많습니다. 기본 크기와 강도 0.4로 돌려 보세요.</li>
+</ul>
+
+<h3 id="ts-color">검은 이미지, 회색으로 바랜 이미지, 색이 이상해요</h3>
+<ul>
+  <li><strong>가장 흔한 원인은 vpred 설정 불일치입니다.</strong> 모델·LoRA 탭의 체크포인트 표에서 그 모델이 v-pred인지 확인하고, 프리셋의 vpred 토글이 같은지 보세요. v-pred 모델인데 꺼져 있으면 회색으로 바래고, eps 모델인데 켜져 있으면 새까맣거나 얼룩진 그림이 나옵니다.</li>
+  <li>v-pred 모델은 샘플러 <code>euler</code>, 스케줄러 <code>normal</code>, CFG 4~5.5로 맞추세요.</li>
+  <li>CFG가 너무 높으면(8 이상) 색이 타고 대비가 지나치게 강해집니다.</li>
+  <li>v-pred용 LoRA를 eps 모델에 쓰면(⚠️) 색감이 틀어질 수 있습니다. 빼고 비교해 보세요.</li>
+  <li>LoRA 강도가 너무 높아도 색이 탑니다. 1.0 이하로 낮춰 보세요.</li>
+  <li>어떤 프리셋으로 만들어도 새까맣다면 엔진을 재시작해 보세요. 계속되면 엔진 로그를 확인합니다.</li>
+</ul>
+
+<h3 id="ts-lora">LoRA 효과가 없어요</h3>
+<ol>
+  <li>호환성 배지가 <strong>❌</strong>인지 확인합니다. SD1.5용 LoRA(<code>add_detail</code> 등)는 SDXL 모델에서 동작하지 않습니다.</li>
+  <li>강도가 너무 낮지 않은지(0.3 미만) 확인합니다.</li>
+  <li>트리거 단어를 프롬프트에 넣었는지 확인합니다. 앱은 트리거를 자동으로 넣지 않습니다.</li>
+  <li>배지가 <strong>⚠️</strong>라면 학습 계열이 달라 효과가 약할 수 있습니다.</li>
+  <li>파일이 끝까지 받아졌는지 확인합니다. 배포 페이지의 파일 크기와 비교해 보세요.</li>
+  <li>엔진 로그에 <code>lora key not loaded</code>가 잔뜩 있다면 구조가 맞지 않는 LoRA입니다.</li>
+</ol>
+<p>확실하게 확인하려면 시드를 고정하고 강도 0과 1.0으로 한 장씩 뽑아 보세요. 두 장이 똑같다면 LoRA가 적용되지 않은 것입니다.</p>
+
+<h3 id="ts-style">그림체가 이상하거나 의도와 달라요</h3>
+<ul>
+  <li>갤러리의 정보 패널에서 실제로 어떤 프리셋·LoRA로 만들어졌는지 먼저 확인하세요. 캐릭터에 지정된 프리셋이 따로 쓰였을 수 있습니다.</li>
+  <li>품질 태그가 그 모델에 맞는지 확인합니다. 예를 들어 Pony용 <code>score_9</code> 태그는 Illustrious 모델에서 의미가 없습니다.</li>
+  <li>품질 태그나 네거티브가 너무 길면 그림이 흐려집니다. 모델 페이지 권장값 정도로 짧게 유지하세요.</li>
+  <li>그림체 LoRA가 너무 세거나, 그림체 LoRA 두 개가 충돌하고 있지 않은지 봅니다.</li>
+  <li>캐릭터의 스타일 칸에 넣은 태그가 원인일 수 있습니다.</li>
+  <li>CFG가 너무 낮으면 흐릿하고, 너무 높으면 딱딱하고 진해집니다. 프리셋 권장 범위로 돌려 보세요.</li>
+  <li>NoobAI Vpred는 원래 그림체 편차가 큰 모델입니다. 안정적인 그림체가 필요하면 <code>wai</code>를 쓰세요.</li>
+</ul>
+
+<h3 id="ts-job">작업이 실패하거나 멈춰요</h3>
+<ul>
+  <li>작업 탭에서 실패한 작업의 메시지 전체를 확인할 수 있습니다.</li>
+  <li><strong>"프리셋을 찾을 수 없음"</strong>: 작업에 지정된 프리셋이 없어졌습니다. Studio에서 프리셋을 지우면 그 프리셋을 쓰던 캐릭터는 기본 프리셋으로 자동으로 바뀌므로, 보통은 <code>config/presets.json</code>이나 캐릭터 파일을 Studio 밖에서(직접 편집·CLI) 고친 경우입니다. 캐릭터 탭이나 생성 탭에서 프리셋을 다시 고르세요.</li>
+  <li><strong>"가로/세로는 512~2048 사이여야 합니다"</strong>: 사용자 지정 크기를 범위 안으로 고치세요.</li>
+  <li><strong>"외형(appearance)은 비워둘 수 없습니다"</strong>: 캐릭터의 외형 칸을 채우세요.</li>
+  <li><strong>체크포인트나 LoRA 파일을 찾을 수 없다는 오류</strong>: 파일 이름이 바뀌었거나 옮겨졌습니다. [목록 새로고침] 후 프리셋·캐릭터의 선택을 다시 하세요.</li>
+  <li><strong>계속 "대기" 상태</strong>: 앞의 작업이 진행 중이거나, ComfyUI 웹 화면 등 다른 곳에서 넣은 작업이 엔진 대기열에 있을 수 있습니다. 상단 바의 큐 개수를 확인하세요.</li>
+  <li><strong>"서버 재시작으로 추적 불가"</strong>: 작업 중에 Studio가 다시 시작된 경우입니다. 엔진은 작업을 끝냈을 수 있으니 갤러리를 확인하세요.</li>
+  <li><strong>취소</strong>: 작업 탭의 [취소]를 누르면 대기 중인 작업은 바로 빠지고, 진행 중인 작업은 현재 단계에서 멈춥니다.</li>
+</ul>
+
+<h3 id="ts-download">모델 다운로드가 안 돼요</h3>
+<ul>
+  <li><strong>401·403 오류</strong>: Civitai에서 로그인이 필요한 모델입니다. 다운로드 폼의 Civitai 토큰 칸에 API 키를 넣으세요. 얼리 액세스(유료 선공개) 모델은 토큰이 있어도 받지 못할 수 있습니다.</li>
+  <li><strong>받은 파일이 몇 KB밖에 안 되거나 모델 목록에 이상하게 나올 때</strong>: 직접 다운로드 링크가 아니라 웹 페이지 주소를 넣은 경우입니다. Hugging Face는 <code>/blob/</code>을 <code>/resolve/</code>로 바꾸고, Civitai는 Download 버튼의 링크를 복사하세요. 잘못 받은 파일은 모델 폴더에서 지우세요.</li>
+  <li><strong>확장자 오류</strong>: <code>.safetensors</code>, <code>.pth</code>, <code>.pt</code>, <code>.ckpt</code>만 받을 수 있습니다. <code>.zip</code> 등은 브라우저로 받아 풀어서 넣으세요.</li>
+  <li><strong>느림</strong>: 체크포인트는 6~7GB입니다. 다운로드는 Studio 서버가 처리하므로 창을 닫아도 되지만, Studio를 종료하면 중단됩니다(이어받기 없음).</li>
+  <li><strong>용량 부족</strong>: T7의 남은 공간을 확인하세요.</li>
+</ul>
+
+<h3 id="ts-extract">프롬프트 추출이 안 돼요 (태거를 쓸 수 없음 · 503)</h3>
+<p>추출 버튼을 눌렀을 때 태거를 쓸 수 없다는 안내가 나오면 태거 파일이나 태거 프로그램을 찾지 못한 것입니다. 이때 Studio는 오류 503을 돌려주며, 엔진(ComfyUI)과는 상관이 없습니다.</p>
+<ol>
+  <li>Finder에서 <code>/Volumes/T7/VN-Pipeline/models/tagger/wd-eva02-large-tagger-v3/</code>를 열어 <code>model.onnx</code>(약 1.26GB)와 <code>selected_tags.csv</code>(약 300KB)가 <strong>둘 다</strong> 있는지 확인합니다. 폴더 이름이나 파일 이름이 다르면 인식하지 않습니다.</li>
+  <li><code>model.onnx</code>가 1.26GB보다 훨씬 작다면 다운로드가 중간에 끊긴 것입니다. Hugging Face의 <code>SmilingWolf/wd-eva02-large-tagger-v3</code>에서 다시 받아 덮어쓰세요(<a href="#extract-tagger">태거 설치 확인과 다른 태거 추가</a>).</li>
+  <li>모델·LoRA 탭 › 전역 설정 › 프롬프트 추출의 <strong>태거 모델</strong>이 실제로 있는 태거인지 확인합니다. 지운 태거가 골라져 있으면 다른 태거로 바꾸세요.</li>
+  <li>안내 문구에 onnxruntime이 없다고 나오면, Studio가 엔진 Python이 아닌 다른 Python으로 실행된 경우입니다. 앱(VN Studio.app)이나 <code>studio.sh</code>로 다시 실행하세요. 엔진 환경에 직접 패키지를 설치하지는 마세요.</li>
+  <li>그래도 안 되면 <code>user/studio.log</code>의 끝부분에서 오류 내용을 확인합니다.</li>
+</ol>
+<ul>
+  <li><strong>"이미지를 읽을 수 없습니다"</strong>: 지원하지 않는 형식이거나 파일이 깨진 경우입니다. png·jpg·webp·gif·bmp만 넣을 수 있습니다. HEIC(아이폰 사진)는 미리보기 앱에서 PNG나 JPEG로 내보낸 뒤 넣으세요. iPhone에서 <a href="#remote">원격 접속</a>으로 사진 보관함에서 고르면 보통 JPEG로 바뀌어 올라갑니다.</li>
+  <li><strong>파일이 너무 크다는 오류</strong>: 이미지 한 장은 20MB, 5000만 화소까지입니다. 줄여서 넣으세요.</li>
+  <li><strong>첫 추출이 오래 걸림</strong>: 처음 한 번(그리고 15분 넘게 쓰지 않은 뒤)은 1.26GB짜리 태거를 읽느라 몇 초 더 걸립니다. 정상입니다.</li>
+</ul>
+
+<h3 id="ts-3d-view">3D 모델이 안 보여요</h3>
+<ul>
+  <li><strong>오류 메시지가 나올 때</strong>: 정보 줄이나 알림에 원인이 나옵니다. 지원 형식은 <code>.glb .gltf .vrm .fbx .obj .pmx .pmd</code>입니다. <code>.blend</code>, <code>.max</code>, <code>.unitypackage</code>, <code>.prefab</code>은 열 수 없으니 원래 프로그램에서 <code>.glb</code>나 <code>.fbx</code>로 내보내세요.</li>
+  <li><strong>오래된 FBX</strong>(버전 6.x, 오래된 Unity 에셋에 많음): 바이너리 파일이면 자동으로 변환해서 열고, 정보 줄에 "오래된 FBX 6.1 형식이라 변환해서 열었습니다"가 나옵니다. 다만 그 파일 안에 든 애니메이션은 변환하지 않아 [애니메이션] 목록에 나오지 않습니다. 텍스트(ASCII) 형식의 FBX 6("너무 오래된 텍스트(ASCII) 형식" 오류)은 열 수 없고, 변환이 실패할 때("FBX 6 해석 실패")도 있습니다. 이럴 때는 Blender에서 가져온 뒤 glTF 바이너리(<code>.glb</code>)로 내보내는 것이 가장 확실하고, 텍스처도 파일 하나에 함께 들어가서 편합니다.</li>
+  <li><strong>화면이 비어 있거나 점처럼 작게 보일 때</strong>: [시점 초기화]와 [전신]을 눌러 보세요. 모델 크기와 위치는 자동으로 맞추지만, 멀리 떨어진 빈 오브젝트(카메라·조명 등)가 들어 있는 파일은 모델이 작게 보일 수 있습니다. 내보낼 때 캐릭터만 선택해서 내보내세요.</li>
+  <li><strong>"WebGL" 관련 오류</strong>: 브라우저의 그래픽 가속이 꺼져 있는 경우입니다. Chrome이라면 설정 › 시스템 › "가능한 경우 그래픽 가속 사용"을 켜고 Chrome을 다시 시작하세요. 3D 화면을 여러 탭에서 띄웠다면 다른 탭을 닫아 보세요.</li>
+  <li><strong>아주 큰 모델</strong>(200MB 넘는 파일, 폴리곤 수백만 개)은 경고 후 계속 진행하며, 여는 데 오래 걸리거나 브라우저가 느려질 수 있습니다. 게임용으로 줄인(LOD가 낮은) 버전을 쓰면 빠릅니다.</li>
+</ul>
+
+<h3 id="ts-3d-dark">3D 모델이 검게 보이거나 너무 어두워요</h3>
+<ul>
+  <li>먼저 <strong>밝기 슬라이더</strong>를 올려 보세요. 원본이 어두운 색이 아니라면 텍스처 색과 비슷해 보이는 밝기로 맞춥니다.</li>
+  <li>모델 일부만 검게 보이면 그 부분의 재질이 Unity·Unreal 전용 셰이더처럼 이 뷰어가 모르는 방식인 경우입니다. 투명해야 할 머리카락 끝이 검게 보이는 것도 같은 원인일 때가 많습니다. Blender에서 기본 재질로 바꿔 <code>.glb</code>로 내보내면 대개 해결됩니다.</li>
+  <li>안팎이 뒤집힌 면(노멀 반전)은 검거나 투명하게 보입니다. 3D 프로그램에서 노멀을 다시 계산해 내보내세요.</li>
+  <li>배경을 [회색]으로 바꾸면 어두운 옷과 배경의 경계가 잘 보여 태거가 더 정확하게 읽습니다.</li>
+</ul>
+
+<h3 id="ts-3d-texture">텍스처가 빠졌어요 (회색으로 보여요)</h3>
+<p>FBX·OBJ·PMX는 텍스처 이미지를 따로 두는 경우가 많습니다. 모델 파일만 고르면 텍스처를 찾지 못해 회색으로 보이고, 정보 줄에 "텍스처를 찾지 못함: 파일 이름" 경고가 나옵니다. 이 상태로 추출하면 색 태그가 틀리거나 <code>greyscale</code>이 붙습니다.</p>
+<ol>
+  <li><strong>[폴더 고르기]</strong>로 모델과 텍스처가 함께 들어 있는 폴더를 통째로 고릅니다. 텍스처가 다른 폴더에 있다면 [파일 고르기]에서 모델 파일과 텍스처 파일을 함께 선택하세요. 뷰어는 파일 이름으로 텍스처를 찾으므로 하위 폴더 구조는 달라도 됩니다.</li>
+  <li>경고에 나온 파일 이름이 실제 파일과 다르다면(다른 PC에서 만들면서 이름이 바뀐 경우) 텍스처 파일 이름을 경고에 나온 이름으로 바꾼 <strong>복사본</strong>을 만들어 함께 고르세요. 원본 프로젝트의 파일은 건드리지 않는 것이 안전합니다.</li>
+  <li><code>.dds</code>, <code>.psd</code>, <code>.tif</code> 텍스처는 읽을 수 없습니다. 게임 프로젝트(Unity 등)의 텍스처가 이런 형식이라면 Blender에서 모델을 가져와 PNG 텍스처로 바꾼 뒤 <code>.glb</code>로 내보내세요.</li>
+  <li>Unity 프로젝트에서 가져온 FBX라면 텍스처가 FBX와 다른 폴더(<code>Textures/</code>, <code>Materials/</code> 등)에 있는 경우가 많습니다. 그 폴더들을 포함하는 상위 폴더를 고르되, 너무 큰 폴더(프로젝트 전체)는 읽는 데 오래 걸릴 수 있습니다.</li>
+</ol>
+
+<h3 id="ts-3d-front">모델이 뒤를 보거나, 누워 있어요</h3>
+<ul>
+  <li><strong>[정면]인데 뒷모습</strong>: 파일마다 "앞" 방향의 기준이 달라서 생깁니다. [앞뒤 바꾸기]를 누르면 180° 돌아갑니다. 그 뒤로는 각도 프리셋이 제대로 동작합니다.</li>
+  <li><strong>누워 있거나 거꾸로 서 있을 때</strong>: 위쪽 방향을 Z축으로 쓰는 프로그램(Blender, 3ds Max 등)에서 설정 없이 내보낸 파일입니다. Blender에서 가져와 glTF로 다시 내보내면(기본 설정 "+Y Up") 바로 섭니다.</li>
+  <li><strong>팔이 이상하게 꺾임</strong>: VRM이 아닌 모델에서는 [팔 내리기]가 뼈 이름(<code>mixamorig:LeftArm</code>, <code>upperarm_l</code> 등)으로 위팔을 찾습니다. 뼈 이름이 특이한 모델은 잘못된 뼈를 돌릴 수 있으니 [팔 내리기]를 끄고, 애니메이션 클립이 있다면 클립에서 자연스러운 자세를 고르세요.</li>
+</ul>
+
+<h3 id="ts-extract-tags">추출된 태그가 이상해요</h3>
+<ul>
+  <li><strong>머리색·눈 색이 틀림</strong>: 조명과 밝기의 영향입니다. 3D라면 밝기 슬라이더를 조절하고 [얼굴] 프레이밍으로 다시 추출해 보세요. 최종적으로는 직접 고치는 것이 가장 확실합니다(<a href="#extract-limits">정확도의 한계</a>).</li>
+  <li><strong>팔 벌림·흰 배경·전신 태그가 들어감</strong>: 이미지 원본에서는 포즈·구도·배경 그룹이 켜져 있습니다. 3D 캡처 이미지를 [이미지]로 넣었다면 [3D 모델]로 직접 여는 쪽이 기본 제외가 적용되어 편합니다.</li>
+  <li><strong>엉뚱한 캐릭터 이름</strong>: 캐릭터 태그는 오인식이 잦아 기본으로 꺼져 있습니다. 켜지 않으면 프롬프트에 들어가지 않습니다.</li>
+  <li><strong>태그가 너무 적음 / 너무 많음</strong>: 일반 태그 기준값을 0.25~0.5 사이에서 조절하세요. 인물이 작게 찍혔다면 인물만 잘라 넣거나 [상반신]으로 찍으면 훨씬 많이 읽힙니다.</li>
+</ul>
+
+<h3 id="ts-pose">포즈를 안 따라와요</h3>
+<p>포즈(ControlNet)를 붙였는데 자세가 다르게 나오면 아래 순서로 확인하세요. 하나씩 바꿀 때는 시드를 고정하고 빠른 미리보기로 비교합니다.</p>
+<ol>
+  <li><strong>포즈가 실제로 붙었는지</strong>: 작업 목록이나 갤러리 정보 패널에 포즈 이름이 나오는지 봅니다. 배경 탭은 포즈를 쓰지 않습니다.</li>
+  <li><strong>강도와 적용 구간</strong>: NoobAI OpenPose는 강도 1.0·적용 구간(끝) 1.0, xinsir는 강도 1.2 이상·1.0이 기본입니다. 실측에서 0.8로 낮추면 든 팔 같은 큰 동작을 무시했습니다. 그래도 안 되면 강도를 0.1~0.2씩 올려 보세요(1.5 이하 권장).</li>
+  <li><strong>ControlNet 선택</strong>: WAI·NoobAI 프리셋에는 NoobAI OpenPose가 가장 잘 따라옵니다. ControlNet 파일 이름을 바꿨다면 앱이 선 굵기를 잘못 고를 수 있으니 원래 이름으로 돌리세요(<a href="#pose-install">ControlNet 파일 확인</a>).</li>
+  <li><strong>프롬프트와의 충돌</strong>: <code>sitting</code>, <code>arms at sides</code>, <code>hands in pockets</code>처럼 포즈와 다른 자세 태그가 있으면 지우세요. 캐릭터 탭의 시안·스프라이트에는 캐릭터의 시안 포즈·스프라이트 포즈 칸이 함께 들어갑니다.</li>
+  <li><strong>포즈 맵 자체</strong>: [포즈 고르기] 창에서 뼈대 보기로 확인합니다. 팔다리 점이 빠져 있으면(화면 밖이었거나 감지 실패) 그 부분은 따라 그리지 않습니다. 정면 포즈인데 코·눈 점이 없으면 뒷모습으로 인식됩니다.</li>
+  <li><strong>크기와 잘림</strong>: 포즈를 고른 뒤 생성 크기를 바꿨다면 포즈가 가운데 기준으로 잘려 팔다리가 사라졌을 수 있습니다. 포즈 크기와 같은 크기로 생성하거나, 쓸 크기로 포즈를 다시 만드세요.</li>
+  <li><strong>원래 어려운 자세</strong>: 팔짱, 다리 꼬기, 카메라 쪽으로 뻗은 팔처럼 앞뒤로 겹치는 자세는 평면 뼈대로 잘 전달되지 않습니다(<a href="#pose-limits">한계</a>).</li>
+</ol>
+<p><strong>반대로 그림이 딱딱하거나 뭉개질 때</strong>: 몸이 뼈대처럼 가늘고 뻣뻣하거나, 선이 뭉개지고 이상한 무늬가 생기면 적용 구간(끝)을 0.8쯤으로, 그래도 그러면 강도를 0.8쯤으로 낮추세요. 머리가 크고 팔다리가 짧은 3D 모델로 만든 포즈는 몸 비율이 어색해지기 쉬우니 보통 비율의 모델로 포즈를 다시 만드세요.</p>
+
+<h3 id="ts-pose-hands">포즈를 붙였더니 손이 이상해요</h3>
+<ul>
+  <li><strong>포즈의 손 뼈대를 확인하세요.</strong> [포즈 고르기] 창의 뼈대 보기에서 손가락 선이 엉켜 있거나 손목과 떨어져 있으면 그 손 뼈대가 원인입니다. 이미지에서 감지할 때 손이 가려져 있었거나, 3D 모델이 주먹을 쥔 순간이면 이렇게 됩니다. 손이 잘 보이는 그림이나 손을 편 순간으로 포즈를 다시 만드세요.</li>
+  <li>손 뼈대 없이 몸 자세만 쓰고 싶다면 CLI로 <code>vn.py pose detect 그림 --no-hands</code>를 실행해 손 없는 포즈를 만들 수 있습니다(<a href="#pose-cli">CLI</a>). 3D 모델은 손가락 뼈가 없으면 처음부터 손이 빠집니다.</li>
+  <li><strong>손 보정은 켜 두세요.</strong> 손 보정은 포즈 없이 돌아가므로 포즈를 붙여도 그대로 손을 다시 그려 줍니다. 그 밖의 방법(손 보정 강도 0.45~0.5, <code>detailed_hands_unhinged</code> LoRA, 시드 바꾸기)은 <a href="#ts-hands">손가락·눈이 깨져요</a>와 같습니다.</li>
+  <li>강도가 너무 높으면 손가락이 뼈대 선을 그대로 따라 가늘고 딱딱해질 수 있습니다. 1.0 근처로 돌려 보세요.</li>
+</ul>
+
+<h3 id="ts-pose-detect">포즈 감지가 안 돼요</h3>
+<ul>
+  <li><strong>"사람(인물)을 찾지 못했습니다"</strong>: 그림에서 사람을 찾지 못한 경우입니다. 인물이 너무 작거나, 사람이 아닌 캐릭터(동물·로봇·극단적인 SD 캐릭터)이거나, 이미 그려진 OpenPose 뼈대 그림을 넣은 경우가 많습니다. 인물 부분만 잘라 넣거나 전신이 잘 보이는 다른 그림을 쓰세요. 3D의 "렌더에서 감지"라면 [정면]·[전신]으로 맞추고 텍스처까지 함께 골라 사람처럼 보이게 한 뒤 다시 시도하세요.</li>
+  <li><strong>감지는 됐는데 뼈대가 엉뚱함</strong>: 얼굴이 화면을 채우는 클로즈업은 어깨·팔 위치가 부정확할 수 있습니다. 여러 명이 있으면 가장 크게 보이는 1명만 뽑으므로, 원하는 사람이 작다면 그 사람만 잘라 넣으세요. 겹쳐 보기로 확인하고 필요 없는 포즈는 삭제합니다.</li>
+  <li><strong>3D에서 "렌더에서 감지"로 바뀜</strong>: 뼈가 없는 <code>.obj</code>나 뼈 이름이 특이한 모델이라 관절을 찾지 못한 것으로, 정상 동작입니다(<a href="#pose-3d-detect">렌더에서 감지</a>).</li>
+  <li><strong>감지 기능을 쓸 수 없다는 안내</strong>: 감지 모델 파일이나 감지 프로그램을 찾지 못한 경우입니다. 엔진과는 상관없습니다.
+    <ol>
+      <li>Finder에서 <code>/Volumes/<wbr>T7/<wbr>ComfyUI/<wbr>Installs/<wbr>ComfyUI/<wbr>ComfyUI/<wbr>custom_nodes/<wbr>comfyui_controlnet_aux/<wbr>ckpts/<wbr>yzd-v/<wbr>DWPose/</code>를 열어 <code>yolox_l.onnx</code>(약 217MB)와 <code>dw-ll_ucoco_384.onnx</code>(약 134MB)가 <strong>둘 다</strong> 있는지 확인합니다. 없거나 크기가 훨씬 작으면 Hugging Face의 <code>yzd-v/DWPose</code> 저장소에서 같은 이름의 파일을 받아 넣으세요.</li>
+      <li>감지 코드는 엔진의 확장 <code>comfyui_controlnet_aux</code> 폴더 안에 있는 것을 씁니다. 이 확장을 지우거나 옮겼다면 다시 설치해야 합니다.</li>
+      <li>onnxruntime이나 OpenCV가 없다고 나오면 Studio가 엔진 Python이 아닌 다른 Python으로 실행된 경우입니다. 앱(VN Studio.app)이나 <code>studio.sh</code>로 다시 실행하세요. 엔진 환경에 직접 패키지를 설치하지는 마세요.</li>
+      <li>그래도 안 되면 <code>user/studio.log</code>의 끝부분에서 오류 내용을 확인합니다.</li>
+    </ol>
+  </li>
+  <li><strong>"이미지를 읽을 수 없습니다", 파일이 너무 크다는 오류</strong>: 프롬프트 추출과 같은 제한입니다(<a href="#ts-extract">프롬프트 추출이 안 돼요</a>).</li>
+</ul>
+
+<h3 id="ts-controlnet">ControlNet 파일이 없다는 오류 · 포즈 관련 작업 실패</h3>
+<ul>
+  <li><strong>ControlNet 파일을 찾을 수 없다는 오류</strong>, 또는 생성 탭의 ControlNet 목록이 비어 있음: <code>noob_openpose.safetensors</code>와 <code>controlnet-openpose-sdxl-1.0.safetensors</code>가 제자리에 있는지, 크기가 약 2.5GB인지 확인하세요. 위치와 다시 받는 방법은 <a href="#pose-install">ControlNet 파일 확인과 다시 받기</a>에 있습니다. 파일을 넣은 뒤에는 모델·LoRA 탭의 [목록 새로고침]을 누르고, 그래도 엔진이 못 찾으면 상단 바의 [재시작]으로 엔진을 다시 켭니다.</li>
+  <li><strong>지운 ControlNet이 기본값으로 남아 있을 때</strong>: 모델·LoRA 탭 › 전역 설정 › 포즈 (ControlNet)의 기본 ControlNet을 설치된 것으로 바꾸세요.</li>
+  <li><strong>"포즈 파일을 찾을 수 없습니다"</strong>: 작업에 지정된 포즈를 삭제했거나 <code>input/poses/</code>에서 옮기거나 이름을 바꾼 경우입니다. 다른 포즈를 고르거나, 삭제한 포즈라면 <code>user/trash/poses/</code>에서 같은 이름의 파일들을 모두 되돌리세요(<a href="#pose-library">포즈 라이브러리</a>).</li>
+  <li><strong>SDXL이 아닌 프리셋이라는 오류</strong>: 포즈는 SDXL 체크포인트에서만 쓸 수 있습니다. SD1.5 등 다른 구조의 체크포인트로 만든 프리셋이라면 SDXL 프리셋(<code>wai</code> 등)으로 바꾸세요.</li>
+  <li><strong>[같은 설정으로 다시]를 했더니 포즈가 빠졌음</strong>: 그 사이 포즈 파일이 삭제된 경우입니다. 안내가 나온 뒤 포즈 없이 진행됩니다.</li>
+  <li><strong>포즈를 붙이면 유독 느리거나 메모리가 부족함</strong>: ControlNet을 쓰면 1차 생성이 약 40% 느려지고 엔진이 ControlNet 파일(약 2.5GB)을 더 읽어 둡니다. 엔진 로그에 메모리 부족이 보이면 <a href="#ts-slow">너무 느리거나 메모리가 부족해요</a>의 방법(다른 앱 닫기, 엔진 재시작)을 먼저 해 보세요.</li>
+</ul>
+
+<h3 id="ts-remote">휴대폰·다른 PC에서 접속이 안 돼요 (원격 접속)</h3>
+<p>원격 접속은 <strong>Mac이 켜져 있고(잠자기 안 함), T7이 연결되어 있고, VN Studio가 실행 중</strong>일 때만 됩니다. 원격 기기에 보이는 것에 따라 아래를 확인하세요. 자세한 설명은 <a href="#remote-trouble">원격 접속 문제 해결</a>에 있습니다.</p>
+<table>
+  <thead><tr><th>보이는 것</th><th>먼저 할 일</th></tr></thead>
+  <tbody>
+    <tr><td>오래 기다리다 <strong>시간 초과</strong>, "사이트에 연결할 수 없음"</td><td>접속하는 기기의 Tailscale이 켜져 있는지, 그 기기의 Tailscale 기기 목록에 <code>my-mac</code>이 온라인인지 봅니다. 꺼져 있으면 대개 <strong>Mac이 잠자기 중</strong>이거나 Mac의 Tailscale이 꺼진 것입니다(<a href="#remote-ts-connect">자세히</a>).</td></tr>
+    <tr><td><strong>502</strong> Bad Gateway</td><td>Mac의 Tailscale은 닿았지만 Studio가 꺼져 있습니다. Mac에서 VN Studio.app을 여세요. Mac을 재시동했거나 T7이 빠졌을 때 흔합니다(<a href="#remote-ts-502">자세히</a>).</td></tr>
+    <tr><td><strong>403</strong> 안내 페이지</td><td>"원격 접속이 꺼져 있습니다"면 Mac에서 [원격 접속 켜기], "허용되지 않은 사용자입니다"면 그 기기의 Tailscale을 Mac과 같은 계정으로 로그인합니다. 종료·폴더 열기 같은 버튼에서만 나오면 원격에서 막아 둔 동작입니다(<a href="#remote-ts-403">자세히</a>).</td></tr>
+    <tr><td>인증서 경고</td><td>주소를 <code>https://my-mac.tail1234.ts.net/</code> 그대로 썼는지 확인합니다. IP나 짧은 이름은 안 됩니다(<a href="#remote-ts-cert">자세히</a>).</td></tr>
+    <tr><td>Mac에서 [원격 접속 켜기]가 실패</td><td>상태 줄의 <strong>HTTPS 인증서</strong>가 ⚠️이면 Tailscale 관리 화면에서 먼저 켭니다(<a href="#remote-https">방법</a>, <a href="#remote-ts-enable">그 밖의 원인</a>).</td></tr>
+    <tr><td>Mac이 자꾸 잠들어 끊김</td><td>VN Studio.app으로 열고 원격 허용이 켜져 있으면 Studio가 도는 동안 유휴 잠자기를 자동으로 막습니다. 터미널로 켠 Studio는 막지 않습니다. MacBook은 덮개를 열어 두어야 합니다(<a href="#remote-sleep">자세히</a>).</td></tr>
+  </tbody>
+</table>
+</section>

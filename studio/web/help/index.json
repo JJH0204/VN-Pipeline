@@ -1,0 +1,20 @@
+[
+  {"id": "start", "title": "시작하기", "file": "start.html"},
+  {"id": "workflow", "title": "생성 워크플로", "file": "workflow.html"},
+  {"id": "prompt", "title": "프롬프트 작성법", "file": "prompt.html"},
+  {"id": "extract", "title": "프롬프트 추출 (이미지·3D)", "file": "extract.html"},
+  {"id": "pose", "title": "포즈 따라 그리기 (ControlNet)", "file": "pose.html"},
+  {"id": "models", "title": "모델(체크포인트)과 프리셋", "file": "models.html"},
+  {"id": "loras", "title": "LoRA 추가·사용법", "file": "loras.html"},
+  {"id": "quality", "title": "품질 설정", "file": "quality.html"},
+  {"id": "sprite", "title": "표정 차분과 투명 스프라이트", "file": "sprite.html"},
+  {"id": "sheet", "title": "스프라이트 시트 (게임 애니메이션)", "file": "sheet.html"},
+  {"id": "pixel", "title": "도트 (픽셀 아트)", "file": "pixel.html"},
+  {"id": "icon", "title": "아이콘 (게임 UI)", "file": "icon.html"},
+  {"id": "remote", "title": "원격 접속 (휴대폰·다른 PC)", "file": "remote.html"},
+  {"id": "secret", "title": "시크릿 모드 (테스트·시연용)", "file": "secret.html"},
+  {"id": "troubleshoot", "title": "문제 해결", "file": "troubleshoot.html"},
+  {"id": "license", "title": "라이선스 주의", "file": "license.html"},
+  {"id": "files", "title": "폴더와 파일", "file": "files.html"},
+  {"id": "glossary", "title": "용어 사전", "file": "glossary.html"}
+]

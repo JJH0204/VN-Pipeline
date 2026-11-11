@@ -1,0 +1,50 @@
+{
+  "id": "lena",
+  "name": "레나",
+  "count": "1girl, solo",
+  "appearance": "black hair, wavy hair, bangs, lob, hair swept behind the ears, medium breasts, slender",
+  "outfit": "bigsize-hoodie, torn jeans, oversized, addmicrodetails",
+  "style": "",
+  "negative": "",
+  "seed": 1069340940,
+  "model": "wai",
+  "loras": [
+    {
+      "name": "AddMicroDetails_Illustrious_v6.safetensors",
+      "weight": 0.5
+    },
+    {
+      "name": "cknb02_stabilizer_v0.304a_fp16.safetensors",
+      "weight": 0.5
+    }
+  ],
+  "concept_pose": "upper body, looking at viewer, smile, simple background, white background",
+  "sprite_pose": "full body, standing, looking at viewer, arms at sides, white background, simple background",
+  "expressions": {
+    "neutral": {
+      "prompt": "closed mouth, light smile",
+      "denoise": 0.55
+    },
+    "smile": {
+      "prompt": "smile, open mouth, happy",
+      "denoise": 0.55
+    },
+    "blush": {
+      "prompt": "blush, embarrassed, looking away, closed mouth",
+      "denoise": 0.6
+    },
+    "angry": {
+      "prompt": "angry, pout, v-shaped eyebrows",
+      "denoise": 0.6
+    },
+    "sad": {
+      "prompt": "sad, frown, teary eyes",
+      "denoise": 0.6
+    },
+    "surprised": {
+      "prompt": "surprised, open mouth, wide-eyed",
+      "denoise": 0.6
+    }
+  },
+  "memo": ""
+}
